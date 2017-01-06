@@ -1,0 +1,20 @@
+{
+  "name": "panel-league",
+  "version": "0.0.1",
+  "description": "Panel de Pon / Tetris Attack / Puzzle Legue clone in browser",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frostburn/panel_league.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/frostburn/panel_league/issues"
+  },
+  "devDependencies": {
+    "eslint": "^3.12.2",
+    "eslint-config-airbnb": "^13.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^3.0.2",
+    "eslint-plugin-react": "^6.8.0"
+  }
+}
