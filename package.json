@@ -1,0 +1,13 @@
+{
+  "name": "panel-league",
+  "version": "0.0.1",
+  "description": "Panel de Pon / Tetris Attack / Puzzle Legue clone in browser",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frostburn/panel_league.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/frostburn/panel_league/issues"
+  }
+}
