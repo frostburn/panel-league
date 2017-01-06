@@ -1,20 +1,23 @@
+<!DOCTYPE html>
 <html>
-<h2>Tetris Attack clone</h2>
-<div id="game_container"></div>
-<button id="reset">Replay</button>
-<button id="kill">Kill</button>
-<button id="step">Step</button>
-<button id="back">Back</button>
-<p>Replay dump</p>
-<textarea id="export"></textarea>
-<br>
-<button id="export_replay">Export</button>
-<button id="import_replay">Import</button>
-<p>NOTE: The engine consumes O(t^2) resources at the moment. Do not leave idle for a long time.</p>
-<script
-    src="https://code.jquery.com/jquery-3.1.1.min.js"
-    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
-    crossorigin="anonymous"
-></script>
-<script src="engine.js" type="text/javascript"></script>
+<head>
+  <meta charset="utf-8">
+  <title>Tetris Attack Clone</title>
+</head>
+<body>
+  <h2>Tetris Attack clone</h2>
+  <div id="game_container"></div>
+  <button id="reset">Replay</button>
+  <button id="kill">Kill</button>
+  <button id="step">Step</button>
+  <button id="back">Back</button>
+  <p>Replay dump</p>
+  <textarea id="export"></textarea>
+  <br>
+  <button id="export_replay">Export</button>
+  <button id="import_replay">Import</button>
+  <p>NOTE: The engine consumes O(t^2) resources at the moment. Do not leave idle for a long time.</p>
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  <script src="./engine.js"></script>
+</body>
 </html>
