@@ -50,7 +50,6 @@ $(() => {
     block.chaining = false;
   }
 
-  // XXX: Chaining information is somehow propageted to unrelated matches and falling blocks.
   function step(stateJSON, events) {
     const state = JSON.parse(stateJSON);
     const blocks = state.blocks;
@@ -88,7 +87,7 @@ $(() => {
           } else {
             block.floatTimer = state.floatTime;
           }
-          block.chaining = bellow.chaining;
+          block.chaining = (block.chaining || bellow.chaining);
         } else if (!block.floatTimer) {
           blocks[i] = bellow;
           blocks[i + WIDTH] = block;
@@ -156,8 +155,8 @@ $(() => {
     // Handle flags and timers and check if we are still chaining matches into more matches
     let chainMatchMade = false;
     let chainAlive = false;
-    for (let i = blocks.length - 1; i >= 0; --i) {
-      const block = blocks[i];
+    blocks.forEach((block, i) => {
+      const above = blocks[i - WIDTH];
 
       if (!block.solid) {
         block.chaining = false;
@@ -175,7 +174,9 @@ $(() => {
 
       if (!--block.flashTimer) {
         clearBlock(block);
-        block.chaining = true;
+        if (above && above.solid) {
+          above.chaining = true;
+        }
       }
       if (block.matching) {
         block.flashTimer = state.flashTime;
@@ -184,7 +185,7 @@ $(() => {
         }
       }
       delete block.matching;
-    }
+    });
 
     if (!chainAlive) {
       state.chainNumber = 0;
