@@ -1,14 +1,22 @@
-/* eslint-env browser, jquery */
+/* eslint-env browser */
+/* global define */
 
-$(() => {
+((global, factory) => {
+  const GameEngine = factory(global);
+
+  if (typeof module === 'object' && module != null && module.exports) {
+    module.exports = GameEngine;
+  } else if (typeof define === 'function' && define.amd) {
+    define(() => GameEngine);
+  } else {
+    global.GameEngine = GameEngine;
+  }
+})(typeof window !== 'undefined' ? window : this, (global) => {
   const WIDTH = 6;
   const HEIGHT = 8;
 
   let time = 0;
   let eventQueue = [];
-
-  let swapperX = 0;
-  let swapperY = 0;
 
   function blocksValid(block1, block2) {
     if (!block1 || !block2) {
@@ -35,7 +43,7 @@ $(() => {
     if (block1.floatTimer === 0 || block2.floatTimer === 0) {
       return false;
     }
-    if (!block1.solid || !block2.solid) {
+    if (!block1.color || !block2.color) {
       return false;
     }
 
@@ -43,8 +51,7 @@ $(() => {
   }
 
   function clearBlock(block) {
-    block.color = '';
-    block.solid = false;
+    block.color = null;
     block.flashTimer = -1;
     block.floatTimer = -1;
     block.chaining = false;
@@ -56,7 +63,7 @@ $(() => {
 
     ++state.time;
     while (events.length) {
-      const [unused, type, param] = events.pop();
+      const [, type, param] = events.pop();
 
       if (type === 'swap') {
         if (param % WIDTH < WIDTH - 1) {
@@ -75,14 +82,14 @@ $(() => {
     for (let i = blocks.length - 1; i >= 0; --i) {
       const block = blocks[i];
 
-      if (!block.solid) {
+      if (!block.color) {
         continue;
       }
 
       const bellow = blocks[i + WIDTH];
-      if (bellow && (!bellow.solid || bellow.floatTimer >= 0)) {
+      if (bellow && (!bellow.color || bellow.floatTimer >= 0)) {
         if (block.floatTimer < 0) {
-          if (bellow.solid) {
+          if (bellow.color) {
             block.floatTimer = bellow.floatTimer;
           } else {
             block.floatTimer = state.floatTime;
@@ -158,7 +165,7 @@ $(() => {
     blocks.forEach((block, i) => {
       const above = blocks[i - WIDTH];
 
-      if (!block.solid) {
+      if (!block.color) {
         block.chaining = false;
       }
 
@@ -174,7 +181,7 @@ $(() => {
 
       if (!--block.flashTimer) {
         clearBlock(block);
-        if (above && above.solid) {
+        if (above && above.color) {
           above.chaining = true;
         }
       }
@@ -197,177 +204,87 @@ $(() => {
     return JSON.stringify(state);
   }
 
-  function update(stateJSON) {
-    const state = JSON.parse(stateJSON);
-    const $container = $('#game_container');
-
-    $container.empty();
-    state.blocks.forEach((block, i) => {
-      const $el = $('<div>').css({
-        background: block.color,
-        width: '20px',
-        height: '20px',
-        float: 'left',
-      });
-
-      if (!block.solid) {
-        $el.css('background', 'transparent');
-      }
-      if (block.flashTimer >= 0) {
-        $el.css('opacity', (block.flashTimer + 1) / (state.flashTime + 2));
-      }
-
-      if (block.floatTimer > 0) {
-        $el.text('F');
-      } else if (block.floatTimer === 0) {
-        $el.text('f');
-      }
-
-      if (block.chaining) {
-        $el.text(`${$el.text()}C`);
-      }
-
-      // Keyboard UI
-      const swapperIndex = swapperX + (WIDTH * swapperY);
-      if (i === swapperIndex || i === swapperIndex + 1) {
-        $el.css({
-          'border-style': 'solid',
-          'box-sizing': 'border-box',
-        });
-      }
-
-      // Mouse input
-      $el.click((e) => {
-        e.preventDefault();
-        eventQueue.push([state.time, 'swap', i]);
-      });
-
-      $container.append($el);
-      if (i % WIDTH === WIDTH - 1) {
-        $container.append($('<div>').css({ clear: 'left' }));
-      }
-    });
-
-    // Status info
-    $container.append($('<p>', { text: `Chain number: ${state.chainNumber}` }));
-    $container.append($('<p>', { text: `Time step: ${state.time}` }));
-  }
-
-  // Keyboard input
-  $(window).keydown((e) => {
-    switch (e.key) {
-      case 'ArrowUp':
-        if (swapperY > 0) {
-          --swapperY;
-        }
-        break;
-
-      case 'ArrowDown':
-        if (swapperY < HEIGHT - 1) {
-          ++swapperY;
-        }
-        break;
-
-      case 'ArrowLeft':
-        if (swapperX > 0) {
-          --swapperX;
-        }
-        break;
-
-      case 'ArrowRight':
-        if (swapperX < WIDTH - 2) {
-          ++swapperX;
-        }
-        break;
-
-      case ' ':
-        eventQueue.push([time, 'swap', swapperX + (WIDTH * swapperY)]);
-        break;
-
-      default:
-        break;
-    }
-  });
-
-  function Block(color, solid) {
-    this.color = color;
-    this.solid = solid;
-    this.flashTimer = -1;
-    this.floatTimer = -1;
-    this.chaining = false;
-  }
-
-  const blocks = [];
-  for (let i = 0; i < WIDTH * HEIGHT; ++i) {
-    if (i % 5 === 0) {
-      blocks.push(new Block('blue', true));
-    } else if (i % 5 === 2) {
-      blocks.push(new Block('green', true));
-    } else if (i % 5 === 3 || i === 39) {
-      blocks.push(new Block('', false));
-    } else {
-      blocks.push(new Block('red', true));
-    }
-  }
-
   let initialState = JSON.stringify({
     time: 0,
     flashTime: 3,
     floatTime: 2,
     chainNumber: 0,
-    blocks,
+    blocks: (() => {
+      const blocks = [];
+
+      for (let i = 0; i < WIDTH * HEIGHT; ++i) {
+        const block = {
+          flashTimer: -1,
+          floatTimer: false,
+          chaining: false,
+        };
+
+        if (i % 5 === 0) {
+          block.color = 'blue';
+        } else if (i % 5 === 2) {
+          block.color = 'green';
+        } else if (i % 5 === 3 || i === 39) {
+          block.color = null;
+        } else {
+          block.color = 'red';
+        }
+        blocks.push(block);
+      }
+
+      return blocks;
+    })(),
   });
 
-  function run() {
-    const eventsByTime = {};
-    let state = initialState;
+  return {
+    width: WIDTH,
+    height: HEIGHT,
 
-    eventQueue.forEach((event) => {
-      const events = eventsByTime[event[0]] || [];
+    getTime() {
+      return time;
+    },
 
-      events.push(event);
-      eventsByTime[event[0]] = events;
-    });
-    for (let instant = 0; instant < time; ++instant) {
-      const events = eventsByTime[instant] || [];
+    setTime(newTime) {
+      time = newTime;
+    },
 
-      state = step(state, events);
-    }
-    ++time;
-    update(state);
-  }
+    step() {
+      const eventsByTime = {};
+      let state = initialState;
 
-  $('#reset').click(() => {
-    time = 0;
-  });
+      eventQueue.forEach((event) => {
+        const events = eventsByTime[event[0]] || [];
 
-  $('#step').click(run);
+        events.push(event);
+        eventsByTime[event[0]] = events;
+      });
+      for (let instant = 0; instant < time; ++instant) {
+        const events = eventsByTime[instant] || [];
 
-  $('#back').click(() => {
-    time -= 2;
-    run();
-  });
+        state = step(state, events);
+      }
+      ++time;
 
-  const mainLoop = setInterval(run, 1000);
+      return JSON.parse(state);
+    },
 
-  $('#kill').click(() => {
-    clearInterval(mainLoop);
-  });
+    addEvent(eventTime, name, ...args) {
+      eventQueue.push([eventTime, name, ...args]);
+    },
 
-  $('#export_replay').click(() => {
-    const dump = {
-      state: initialState,
-      events: eventQueue,
-    };
-    $('#export').val(btoa(JSON.stringify(dump)));
-  });
+    exportState() {
+      return global.btoa(JSON.stringify({
+        state: initialState,
+        events: eventQueue,
+      }));
+    },
 
-  $('#import_replay').click(() => {
-    const dump = JSON.parse(atob($('#export').val()));
+    importState(dump) {
+      const imported = JSON.parse(global.atob(dump));
 
-    initialState = dump.state;
-    eventQueue = dump.events;
-  });
+      initialState = imported.state;
+      eventQueue = imported.events;
+    },
+  };
 
   // TODO: Multiplayer
   // http://socket.io/get-started/chat/
