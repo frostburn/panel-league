@@ -37,13 +37,11 @@ $(() => {
         break;
 
       case ' ':
-        if (mainLoop != null) {
-          GameEngine.addEvent(
-            GameEngine.getTime(),
-            'swap',
-            swapperX + (GameEngine.width * swapperY)
-          );
-        }
+        GameEngine.addEvent(
+          GameEngine.getTime(),
+          'swap',
+          swapperX + (GameEngine.width * swapperY)
+        );
         break;
 
       default:
@@ -65,6 +63,14 @@ $(() => {
       $block.css('background', block.color || 'transparent');
       if (block.flashTimer >= 0) {
         $block.css('opacity', (block.flashTimer + 1) / (state.flashTime + 2));
+      }
+
+      if (block.swapTimer !== 0) {
+        // Add a little extra nudge to make initial swapping visible too.
+        let swapRatio = block.swapTimer / (state.swapTime + 0.1);
+        swapRatio *= 20;
+        $block.css('margin-right', swapRatio + "px");
+        $block.css('margin-left', -swapRatio + "px");
       }
 
       if (block.floatTimer > 0) {
