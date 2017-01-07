@@ -1,6 +1,16 @@
 /* eslint-env browser */
 /* global define */
 
+// Block properties
+// Non-solid: Null color blocks act as air.
+// Solid: The block can be swapped with other blocks and air and is displayed displayed by the UI.
+// Floating: If a block has air under it, it will start to float and hang in the air for a while (floatTimer > 0).
+// Falling: The float timer has ran out and the block is in free fall one unit per time step (floatTimer == 0).
+// Landed: The block has a solid block beneath it and is no longer in free fall (floatTimer < 0).
+// Flashing: The block is part of a match (of 3 or more) and will soon turn into air (flashTimer >= 0).
+// Chaining: The block is part of a continuous chain where blocks from a previous match drop into a new match (chaining == true).
+// Swapping: The block has begun swapping and is on its way to the new location (swapTimer != 0).
+
 ((global, factory) => {
   const GameEngine = factory(global);
 
@@ -46,6 +56,9 @@
     if (!block1.color || !block2.color) {
       return false;
     }
+    if (block1.swapTimer !== 0 || block2.swapTimer !== 0) {
+      return false;
+    }
 
     return (block1.color === block2.color);
   }
@@ -54,6 +67,7 @@
     block.color = null;
     block.flashTimer = -1;
     block.floatTimer = -1;
+    block.swapTimer = 0;
     block.chaining = false;
   }
 
@@ -62,6 +76,17 @@
     const blocks = state.blocks;
 
     ++state.time;
+
+    // Swap timers need to be handled before setting new swap times through events.
+    blocks.forEach((block, i) => {
+      if (block.swapTimer > 0) {
+        --block.swapTimer;
+      }
+      else if (block.swapTimer < 0) {
+        ++block.swapTimer;
+      }
+    });
+
     while (events.length) {
       const [, type, param] = events.pop();
 
@@ -71,6 +96,15 @@
           const block2 = blocks[param + 1];
 
           if (blocksCanSwap(block1, block2)) {
+            // Upon swapping the blocks immediately warp into their new locations,
+            // but receive a swap timer that partially disable them for a while.
+            // The UI will display this time as a sliding animation.
+
+            // Block 1 goes left to right
+            block1.swapTimer = state.swapTime;
+            // Block 2 goes right to left
+            block2.swapTimer = -state.swapTime;
+
             blocks[param] = block2;
             blocks[param + 1] = block1;
           }
@@ -208,6 +242,7 @@
     time: 0,
     flashTime: 3,
     floatTime: 2,
+    swapTime: 2,
     chainNumber: 0,
     blocks: (() => {
       const blocks = [];
@@ -215,7 +250,8 @@
       for (let i = 0; i < WIDTH * HEIGHT; ++i) {
         const block = {
           flashTimer: -1,
-          floatTimer: false,
+          floatTimer: -1,
+          swapTimer: 0,
           chaining: false,
         };
 
