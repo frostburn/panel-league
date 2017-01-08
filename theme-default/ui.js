@@ -3,6 +3,7 @@
 
 $(() => {
   const $container = $('#game-container');
+  const currentGame = new GameEngine();
 
   let swapperX = 0;
   let swapperY = 0;
@@ -19,7 +20,7 @@ $(() => {
         break;
 
       case 'ArrowDown':
-        if (swapperY < GameEngine.height - 1) {
+        if (swapperY < currentGame.height - 1) {
           ++swapperY;
         }
         break;
@@ -31,22 +32,22 @@ $(() => {
         break;
 
       case 'ArrowRight':
-        if (swapperX < GameEngine.width - 2) {
+        if (swapperX < currentGame.width - 2) {
           ++swapperX;
         }
         break;
 
       // The f key was chosen as it is in a natural position for the left hand.
       case 'f':
-        GameEngine.addEvent(
-          GameEngine.getTime(),
+        currentGame.addEvent(
+          currentGame.time,
           'swap',
-          swapperX + (GameEngine.width * swapperY)
+          swapperX + (currentGame.width * swapperY)
         );
         break;
 
       case ' ':
-        GameEngine.addEvent(GameEngine.getTime(), 'addRow');
+        currentGame.addEvent(currentGame.time, 'addRow');
         break;
 
       default:
@@ -91,7 +92,7 @@ $(() => {
       }
 
       // Keyboard UI
-      const swapperIndex = swapperX + (GameEngine.width * swapperY);
+      const swapperIndex = swapperX + (currentGame.width * swapperY);
       if (i === swapperIndex || i === swapperIndex + 1) {
         $block.css({
           'border-style': 'solid',
@@ -102,11 +103,11 @@ $(() => {
       // Mouse input
       $block.click((e) => {
         e.preventDefault();
-        GameEngine.addEvent(state.time, 'swap', i);
+        currentGame.addEvent(state.time, 'swap', i);
       });
 
       $container.append($block);
-      if (i % GameEngine.width === GameEngine.width - 1) {
+      if (i % currentGame.width === currentGame.width - 1) {
         $container.append($('<div>', { css: { clear: 'left' } }));
       }
     });
@@ -124,7 +125,7 @@ $(() => {
       // Adding new rows
       $block.click((e) => {
         e.preventDefault();
-        GameEngine.addEvent(state.time, 'addRow');
+        currentGame.addEvent(state.time, 'addRow');
       });
       $container.append($block);
     });
@@ -138,20 +139,20 @@ $(() => {
   let debugState;
 
   mainLoop = window.setInterval(() => {
-    debugState = GameEngine.step();
+    debugState = currentGame.step();
     update(debugState);
   }, 1000);
 
   $('#btn-reset').click(() => {
-    GameEngine.setTime(0);
+    currentGame.time = 0;;
   });
   $('#btn-step').click(() => {
-    debugState = GameEngine.step()
+    debugState = currentGame.step()
     update(debugState);
   });
   $('#btn-back').click(() => {
-    GameEngine.setTime(GameEngine.getTime() - 2);
-    debugState = GameEngine.step()
+    currentGame.time -= 2;
+    debugState = currentGame.step()
     update(debugState);
   });
   $('#btn-kill').click(() => {
@@ -165,10 +166,10 @@ $(() => {
   });
 
   $('#btn-export-replay').click(() => {
-    $('#export').val(GameEngine.exportState());
+    $('#export').val(currentGame.exportState());
   });
 
   $('#btn-import-replay').click(() => {
-    GameEngine.importState($('#export').val());
+    currentGame.importState($('#export').val());
   });
 });
