@@ -24,6 +24,7 @@
 })(typeof window !== 'undefined' ? window : this, (global) => {
   const WIDTH = 6;
   const HEIGHT = 8;
+  const INITIAL_ROWS = 3;
 
   let time = 0;
   let eventQueue = [];
@@ -59,8 +60,20 @@
     if (block1.swapTimer !== 0 || block2.swapTimer !== 0) {
       return false;
     }
+    if (block1.color === block2.color) {
+      return (!block1.preventMatching && !block2.preventMatching);
+    }
+    return false;
+  }
 
-    return (block1.color === block2.color);
+  function newBlock() {
+    return {
+      color: null,
+      flashTimer: -1,
+      floatTimer: -1,
+      swapTimer: 0,
+      chaining: false,
+    };
   }
 
   function clearBlock(block) {
@@ -69,6 +82,115 @@
     block.floatTimer = -1;
     block.swapTimer = 0;
     block.chaining = false;
+  }
+
+  // Match three or more similar blocks horizontally or vertically
+  function findMatches(blocks) {
+    let matchFound = false;
+    blocks.forEach((block, i) => {
+      const bellow = blocks[i + WIDTH];
+      const above = blocks[i - WIDTH];
+      let left;
+      let right;
+
+      if (i % WIDTH > 0) {
+        left = blocks[i - 1];
+      }
+      if (i % WIDTH < WIDTH - 1) {
+        right = blocks[i + 1];
+      }
+
+      if (blocksMatch(left, block) && blocksMatch(block, right)) {
+        left.matching = true;
+        block.matching = true;
+        right.matching = true;
+        matchFound = true;
+      }
+
+      if (blocksMatch(bellow, block) && blocksMatch(block, above)) {
+        above.matching = true;
+        block.matching = true;
+        bellow.matching = true;
+        matchFound = true;
+      }
+    });
+    return matchFound;
+  }
+
+  function invalidateMatches(blocks) {
+    blocks.forEach((block) => {
+      if (block.matching) {
+        block.preventMatching = true;
+      }
+    });
+  }
+
+  function clearMatches(blocks, includeInvalid) {
+    blocks.forEach((block) => {
+      delete block.matching;
+      if (includeInvalid) {
+        delete block.preventMatching;
+      }
+    });
+  }
+
+  function pushRow(blocks, nextRow) {
+    for (let i = 0; i < WIDTH; ++i) {
+      blocks.shift();
+      blocks.push(nextRow[i]);
+    }
+  }
+
+  // When adding rows we must not create new matches unless forced to.
+  function addRow(state) {
+    if (state.nextRow) {
+      pushRow(state.blocks, state.nextRow);
+      // Find matches that are forced and exclude them.
+      findMatches(state.blocks);
+      invalidateMatches(state.blocks);
+      clearMatches(state.blocks);
+    }
+    const RNG = JKISS31.unserialize(state.RNG);
+    while (true) {
+      const nextRow = [];
+      for (let i = 0; i < WIDTH; ++i) {
+        const block = newBlock();
+        switch (RNG.step() % 3) {
+          case 0:
+            block.color = "red";
+            break;
+          case 1:
+            block.color = "green";
+            break;
+          case 2:
+            block.color = "blue";
+            break;
+          default:
+            throw new Error("Bogus value from RNG");
+            break;
+        }
+        nextRow.push(block);
+      }
+      // Make sure that no unnecessary matches would be made when pushing the new row.
+      const candidateBlocks = state.blocks.slice();
+      pushRow(candidateBlocks, nextRow);
+      const candidateMatches = findMatches(candidateBlocks);
+      clearMatches(candidateBlocks);
+      if (!candidateMatches) {
+        state.nextRow = nextRow;
+        break;
+      }
+    }
+    clearMatches(state.blocks, true);
+    state.RNG = RNG.serialize();
+  }
+
+  function prepareRows(stateJSON, numRows) {
+    const state = JSON.parse(stateJSON);
+    for (let i = 0; i < numRows; ++i) {
+      addRow(state);
+    }
+    return JSON.stringify(state);
   }
 
   function step(stateJSON, events) {
@@ -110,6 +232,10 @@
           }
         }
       }
+      else if (type == 'addRow') {
+        // TODO: Add a signal for game over if touching the roof.
+        addRow(state);
+      }
     }
 
     // Iterate from bottom to top to handle gravity
@@ -148,31 +274,7 @@
     }
 
     // Match three or more similar blocks horizontally or vertically
-    blocks.forEach((block, i) => {
-      const bellow = blocks[i + WIDTH];
-      const above = blocks[i - WIDTH];
-      let left;
-      let right;
-
-      if (i % WIDTH > 0) {
-        left = blocks[i - 1];
-      }
-      if (i % WIDTH < WIDTH - 1) {
-        right = blocks[i + 1];
-      }
-
-      if (blocksMatch(left, block) && blocksMatch(block, right)) {
-        left.matching = true;
-        block.matching = true;
-        right.matching = true;
-      }
-
-      if (blocksMatch(bellow, block) && blocksMatch(block, above)) {
-        above.matching = true;
-        block.matching = true;
-        bellow.matching = true;
-      }
-    });
+    findMatches(state.blocks);
 
     // Propagate chaining information
     let floodFillActive = true;
@@ -234,8 +336,9 @@
           chainMatchMade = true;
         }
       }
-      delete block.matching;
     });
+
+    clearMatches(blocks);
 
     if (!chainAlive) {
       state.chainNumber = 0;
@@ -247,35 +350,24 @@
     return JSON.stringify(state);
   }
 
+  let initialRNG = new JKISS31();
+  initialRNG.scramble();
+  initialRNG = initialRNG.serialize();
+
   let initialState = JSON.stringify({
     time: 0,
     flashTime: 3,
     floatTime: 2,
     swapTime: 2,
     chainNumber: 0,
+    initialRows: INITIAL_ROWS,
+    RNG: initialRNG,
+    nextRow: null,
     blocks: (() => {
       const blocks = [];
-
       for (let i = 0; i < WIDTH * HEIGHT; ++i) {
-        const block = {
-          flashTimer: -1,
-          floatTimer: -1,
-          swapTimer: 0,
-          chaining: false,
-        };
-
-        if (i % 5 === 0) {
-          block.color = 'blue';
-        } else if (i % 5 === 2) {
-          block.color = 'green';
-        } else if (i % 5 === 3 || i === 39) {
-          block.color = null;
-        } else {
-          block.color = 'red';
-        }
-        blocks.push(block);
+        blocks.push(newBlock());
       }
-
       return blocks;
     })(),
   });
@@ -295,6 +387,8 @@
     step() {
       const eventsByTime = {};
       let state = initialState;
+      const initialRows = JSON.parse(initialState).initialRows;
+      state = prepareRows(state, initialRows + 1);
 
       eventQueue.forEach((event) => {
         const events = eventsByTime[event[0]] || [];

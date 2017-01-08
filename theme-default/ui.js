@@ -36,12 +36,17 @@ $(() => {
         }
         break;
 
-      case ' ':
+      // The f key was chosen as it is in a natural position for the left hand.
+      case 'f':
         GameEngine.addEvent(
           GameEngine.getTime(),
           'swap',
           swapperX + (GameEngine.width * swapperY)
         );
+        break;
+
+      case ' ':
+        GameEngine.addEvent(GameEngine.getTime(), 'addRow');
         break;
 
       default:
@@ -105,6 +110,25 @@ $(() => {
         $container.append($('<div>', { css: { clear: 'left' } }));
       }
     });
+
+    state.nextRow.forEach((block) => {
+      const $block = $('<div>', {
+        css: {
+          width: '20px',
+          height: '20px',
+          float: 'left',
+          background: block.color,
+          opacity: 0.3,
+        },
+      });
+      // Adding new rows
+      $block.click((e) => {
+        e.preventDefault();
+        GameEngine.addEvent(state.time, 'addRow');
+      });
+      $container.append($block);
+    });
+    $container.append($('<div>', { css: { clear: 'left' } }));
 
     // Status info
     $container.append($('<p>', { text: `Chain number: ${state.chainNumber}` }));
