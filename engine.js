@@ -120,8 +120,17 @@
         continue;
       }
 
+      // Floating and falling:
+      // A block can float or fall if
+      // it is not at ground level and
+      // it is not swapping and
+      // either beneath there's air or a floating/falling block that is not swapping.
       const bellow = blocks[i + WIDTH];
-      if (bellow && (!bellow.color || bellow.floatTimer >= 0)) {
+      if (
+        bellow &&
+        !block.swapTimer &&
+        (!bellow.color || (bellow.floatTimer >= 0 && !bellow.swapTimer))
+      ) {
         if (block.floatTimer < 0) {
           if (bellow.color) {
             block.floatTimer = bellow.floatTimer;
