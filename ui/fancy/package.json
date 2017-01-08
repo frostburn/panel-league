@@ -1,0 +1,18 @@
+{
+  "name": "panel-league-ui-fancy",
+  "version": "0.0.1",
+  "description": "Fancy user interface for Panel League",
+  "license": "MIT",
+  "scripts": {
+    "build": "./node_modules/.bin/webpack",
+    "watch": "./node_modules/.bin/webpack -d --watch"
+  },
+  "dependencies": {
+    "css-loader": "^0.26.1",
+    "less": "^2.7.2",
+    "less-loader": "^2.2.3",
+    "style-loader": "^0.13.1",
+    "uglify-js": "git+https://github.com/mishoo/UglifyJS2.git#harmony",
+    "webpack": "^2.2.0-rc.3"
+  }
+}
