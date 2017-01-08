@@ -1,0 +1,14 @@
+{
+  "name": "panel-league-ui-debug",
+  "version": "0.0.1",
+  "description": "Debugging user interface for Panel League",
+  "license": "MIT",
+  "scripts": {
+    "build": "./node_modules/.bin/webpack",
+    "watch": "./node_modules/.bin/webpack -d --watch"
+  },
+  "dependencies": {
+    "uglify-js": "git+https://github.com/mishoo/UglifyJS2.git#harmony",
+    "webpack": "^2.2.0-rc.3"
+  }
+}

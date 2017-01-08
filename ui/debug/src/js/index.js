@@ -1,5 +1,6 @@
 /* eslint-env browser, jquery */
-/* global GameEngine */
+
+const GameEngine = require('../../../../lib/engine');
 
 $(() => {
   const $container = $('#game-container');
