@@ -3,7 +3,8 @@
 
 $(() => {
   const $container = $('#game-container');
-  const currentGame = new GameEngine();
+  let currentGame = new GameEngine();
+  let frameRate = 1;
 
   let swapperX = 0;
   let swapperY = 0;
@@ -137,20 +138,20 @@ $(() => {
   }
 
   let debugState;
-
-  mainLoop = window.setInterval(() => {
+  function step() {
     debugState = currentGame.step();
     update(debugState);
-  }, 1000);
+  }
+
+  mainLoop = window.setInterval(step, 1000 / frameRate);
 
   $('#btn-reset').click(() => {
+    currentGame.invalidateCache();
     currentGame.time = 0;;
   });
-  $('#btn-step').click(() => {
-    debugState = currentGame.step()
-    update(debugState);
-  });
+  $('#btn-step').click(step);
   $('#btn-back').click(() => {
+    currentGame.invalidateCache();
     currentGame.time -= 2;
     debugState = currentGame.step()
     update(debugState);
@@ -168,8 +169,24 @@ $(() => {
   $('#btn-export-replay').click(() => {
     $('#export').val(currentGame.exportState());
   });
-
   $('#btn-import-replay').click(() => {
     currentGame.importState($('#export').val());
+  });
+
+  $('#btn-rules-debug').click(() => {
+    window.clearInterval(mainLoop);
+    currentGame = new GameEngine();
+    frameRate = 1;
+    mainLoop = window.setInterval(step, 1000 / frameRate);
+  });
+  $('#btn-rules-easy').click(() => {
+    window.clearInterval(mainLoop);
+    currentGame = new GameEngine({
+      flashTime: 40,
+      floatTime: 30,
+      swapTime: 3,
+    });
+    frameRate = 30;
+    mainLoop = window.setInterval(step, 1000 / frameRate);
   });
 });
