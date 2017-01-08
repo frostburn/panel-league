@@ -10,11 +10,15 @@
   "bugs": {
     "url": "https://github.com/frostburn/panel-league/issues"
   },
+  "scripts": {
+    "test": "./node_modules/.bin/nodeunit"
+  },
   "devDependencies": {
     "eslint": "^3.12.2",
     "eslint-config-airbnb": "^13.0.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^3.0.2",
-    "eslint-plugin-react": "^6.8.0"
+    "eslint-plugin-react": "^6.8.0",
+    "nodeunit": "^0.9.1"
   }
 }
