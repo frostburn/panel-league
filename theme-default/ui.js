@@ -67,7 +67,9 @@ $(() => {
 
       if (block.swapTimer !== 0) {
         // Add a little extra nudge to make initial swapping visible too.
-        let swapRatio = block.swapTimer / (state.swapTime + 0.1);
+        // Make the nudge unsymmetric to avoid the blocks overlapping during the swap.
+        const nudge = (block.swapTimer < 0) ? 0.1 : 0.4;
+        let swapRatio = block.swapTimer / (state.swapTime + nudge);
         swapRatio *= 20;
         $block.css('margin-right', swapRatio + "px");
         $block.css('margin-left', -swapRatio + "px");
@@ -109,25 +111,33 @@ $(() => {
     $container.append($('<p>', { text: `Time step: ${state.time}` }));
   }
 
+  let debugState;
+
   mainLoop = window.setInterval(() => {
-    update(GameEngine.step());
+    debugState = GameEngine.step();
+    update(debugState);
   }, 1000);
 
   $('#btn-reset').click(() => {
     GameEngine.setTime(0);
   });
   $('#btn-step').click(() => {
-    update(GameEngine.step());
+    debugState = GameEngine.step()
+    update(debugState);
   });
   $('#btn-back').click(() => {
     GameEngine.setTime(GameEngine.getTime() - 2);
-    update(GameEngine.step());
+    debugState = GameEngine.step()
+    update(debugState);
   });
   $('#btn-kill').click(() => {
     if (mainLoop != null) {
       window.clearInterval(mainLoop);
       mainLoop = null;
     }
+  });
+  $('#btn-print').click(() => {
+    console.log(debugState);
   });
 
   $('#btn-export-replay').click(() => {
