@@ -16,10 +16,29 @@ class UserInterface {
     this.previewBlocks = [];
     this.swapper = new Swapper(this, 0, 0);
     this.frameRate = 30;
+    this.previousChainNumber = 0;
   }
 
   get isGameRunning() {
     return this.game != null && this.gameLoop != null;
+  }
+
+  showBlockTooltip(blockElement, text) {
+    const element = document.createElement('div');
+    const rect = blockElement.getBoundingClientRect();
+
+    element.textContent = text;
+    element.classList.add('tooltip');
+    element.style.position = 'absolute';
+    element.style.left = `${rect.left}px`;
+    element.style.top = `${rect.top}px`;
+    document.body.appendChild(element);
+    window.setTimeout(() => {
+      element.classList.add('animate');
+    }, 100);
+    window.setTimeout(() => {
+      document.body.removeChild(element);
+    }, 1000);
   }
 
   install() {
@@ -161,6 +180,15 @@ class UserInterface {
       element.classList.remove('red', 'green', 'blue');
       element.classList.add(block.color);
     });
+
+    if (state.chainNumber > 0 && state.chainNumber !== this.previousChainNumber) {
+      const chainingBlockIndex = state.blocks.findIndex((block) => block.chaining);
+
+      if (chainingBlockIndex >= 0) {
+        this.showBlockTooltip(this.blocks[chainingBlockIndex], `${state.chainNumber}`);
+      }
+    }
+    this.previousChainNumber = state.chainNumber;
   }
 
   action(actionName, actionArguments = {}) {

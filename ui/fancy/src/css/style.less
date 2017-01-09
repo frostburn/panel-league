@@ -4,6 +4,7 @@
 @color-block-green: #2c8437;
 @color-block-blue: #303e73;
 @color-swapper: #ffffff;
+@color-tooltip: #ffffff;
 
 @grid-width: 6;
 @grid-height: 8;
@@ -106,5 +107,24 @@ body {
         opacity: 0.3;
       }
     }
+  }
+}
+
+.tooltip {
+  z-index: 999;
+  width: @block-size;
+  height: @block-size;
+  max-width: @block-size;
+  max-height: @block-size;
+  font-size: @block-size / 2;
+  line-height: @block-size;
+  text-align: center;
+  color: @color-tooltip;
+  transition: transform 1s, opacity 1s;
+  font-family: Arial, Verdana, sans-serif;
+
+  &.animate {
+    transform: translateY(-(@block-size * 2));
+    opacity: 0.3;
   }
 }
