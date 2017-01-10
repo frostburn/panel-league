@@ -1,10 +1,52 @@
 /* eslint-env browser, jquery */
 
 const GameEngine = require('../../../../lib/engine');
+let EngineClass = GameEngine;
 
 $(() => {
+  if ('io' in window) {
+    const socket = io();
+    EngineClass = class extends GameEngine {
+      addEvent(...args) {
+        super.addEvent(...args);
+        socket.emit('game event', {'event': args});
+      }
+      addBroadcastEvent(...args) {
+        super.addEvent(...args);
+      }
+    };
+
+    socket.on('connected', (data) => {
+      const game = data.game;
+      Object.assign(currentGame, data.game);
+      currentGame.importCache(data.cache);
+      frameRate = data.frameRate;
+      mainLoop = window.setInterval(step, 1000 / frameRate);
+    });
+
+    // We expect the browser clock to run slower than
+    // the server clock so we only implement catch up.
+    socket.on('clock', (data) => {
+      const serverTime = data.time;
+      while (currentGame.time < serverTime) {
+        step();
+      }
+    });
+
+    socket.on('game event', (data) => {
+      currentGame.addBroadcastEvent(...data.event);
+    });
+
+    // These features are not available when running in slave mode.
+    $('#btn-reset').remove();
+    $('#btn-step').remove();
+    $('#btn-back').remove();
+    $('#btn-rules-debug').remove();
+    $('#btn-rules-easy').remove();
+  }
+
   const $container = $('#game-container');
-  let currentGame = new GameEngine();
+  let currentGame = new EngineClass();
   let frameRate = 1;
 
   let swapperX = 0;
@@ -144,7 +186,9 @@ $(() => {
     update(debugState);
   }
 
-  mainLoop = window.setInterval(step, 1000 / frameRate);
+  if (!('io' in window)) {
+    mainLoop = window.setInterval(step, 1000 / frameRate);
+  }
 
   $('#btn-reset').click(() => {
     currentGame.invalidateCache();
@@ -176,13 +220,13 @@ $(() => {
 
   $('#btn-rules-debug').click(() => {
     window.clearInterval(mainLoop);
-    currentGame = new GameEngine();
+    currentGame = new EngineClass();
     frameRate = 1;
     mainLoop = window.setInterval(step, 1000 / frameRate);
   });
   $('#btn-rules-easy').click(() => {
     window.clearInterval(mainLoop);
-    currentGame = new GameEngine({
+    currentGame = new EngineClass({
       flashTime: 40,
       floatTime: 30,
       swapTime: 3,
