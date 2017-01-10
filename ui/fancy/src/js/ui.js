@@ -1,3 +1,5 @@
+/* eslint-env browser */
+
 const GameEngine = require('../../../../lib/engine');
 const Grid = require('./grid');
 
@@ -65,13 +67,13 @@ class UserInterface {
 
   installGamepadListener() {
     const gamepadListener = () => {
-      for (let index in this.gamepadSupport.devices) {
+      Object.keys(this.gamepadSupport.devices).forEach((index) => {
         const device = this.gamepadSupport.devices[index];
         const timestamp = device.timestamp;
         const previousTimestamp = this.gamepadSupport.previousTimestamps[index];
 
         if (previousTimestamp && previousTimestamp === timestamp) {
-          continue;
+          return;
         }
         this.gamepadSupport.previousTimestamps[index] = timestamp;
 
@@ -96,7 +98,7 @@ class UserInterface {
             }
           }
         }
-      }
+      });
       if (Object.keys(this.gamepadSupport.devices).length > 0) {
         window.requestAnimationFrame(gamepadListener);
       }
