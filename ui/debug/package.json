@@ -8,6 +8,8 @@
     "watch": "./node_modules/.bin/webpack -d --watch"
   },
   "dependencies": {
+    "express": "^4.10.2",
+    "socket.io": "^1.7.2",
     "uglify-js": "git+https://github.com/mishoo/UglifyJS2.git#harmony",
     "webpack": "^2.2.0-rc.3"
   }

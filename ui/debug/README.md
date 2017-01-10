@@ -11,3 +11,7 @@ sure that you have all the dependencies installed first by running `npm
 install`. After that you can use command `npm run build` to compile the assets.
 You can also run `npm run watch`, which launches Webpack in watch mode where it
 observes changes to the files.
+
+## Running the server
+Run `npm start` and navigate to http://localhost:3000/
+Multiple clients will connect to the same game for a co-op multiplayer experience.
