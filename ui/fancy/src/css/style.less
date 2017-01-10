@@ -42,6 +42,7 @@ body {
       &::after {
         content: ' ';
         display: inline-block;
+        font-family: FontAwesome;
         font-size: @block-size / 2;
       }
 
@@ -53,7 +54,7 @@ body {
         border-right-color: darken(@color-block-red, 15%);
 
         &::after {
-          content: '❤';
+          content: @symbol-block-heart;
           color: lighten(@color-block-red, 30%);
         }
       }
@@ -66,7 +67,7 @@ body {
         border-right-color: darken(@color-block-green, 15%);
 
         &::after {
-          content: '▲';
+          content: @symbol-block-chevron-up;
           color: lighten(@color-block-green, 25%);
         }
       }
@@ -79,7 +80,7 @@ body {
         border-right-color: darken(@color-block-blue, 15%);
 
         &::after {
-          content: '●';
+          content: @symbol-block-circle;
           color: lighten(@color-block-blue, 25%);
         }
       }
