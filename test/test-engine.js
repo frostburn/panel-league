@@ -1,6 +1,12 @@
 const GameEngine = require('../lib/engine.js');
 const shuffle = require('../lib/util.js').shuffle;
 
+// Block colors
+const R = 'red';
+const G = 'green';
+const B = 'blue';
+const _ = null;
+
 module.exports.testDeterminism = function (test) {
   // Make two copies of the same game.
   const firstGame = new GameEngine();
@@ -47,3 +53,57 @@ module.exports.testDeterminism = function (test) {
   );
   test.done();
 };
+
+function runGame(game, numSteps) {
+  let maxChain = 0;
+  for (let i = 0; i < numSteps; ++i) {
+    maxChain = Math.max(
+      maxChain,
+      game.step().chainNumber
+    );
+  }
+  return maxChain;
+}
+
+module.exports.testHorizontalChain = function (test) {
+  const horizontalSetup = [
+    _, G, G, R, R, _,
+    G, R, R, B, B, B,
+  ];
+  const game = new GameEngine({
+    width: 6,
+    height: 2,
+    colors: horizontalSetup,
+  });
+  const maxChain = runGame(game, 100);
+
+  test.expect(2);
+  test.strictEqual(maxChain, 2);
+  test.ok(game.colors.every(color => color === null));
+  test.done();
+}
+
+module.exports.testVerticalChain = function (test) {
+  const verticalSetup = [
+    B,
+    B,
+    G,
+    G,
+    R,
+    R,
+    R,
+    G,
+    B,
+  ];
+  const game = new GameEngine({
+    width: 1,
+    height: 9,
+    colors: verticalSetup,
+  });
+  const maxChain = runGame(game, 100);
+
+  test.expect(2);
+  test.strictEqual(maxChain, 2);
+  test.ok(game.colors.every(color => color === null));
+  test.done();
+}
