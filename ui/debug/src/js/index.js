@@ -5,6 +5,7 @@ let EngineClass = GameEngine;
 
 $(() => {
   if ('io' in window) {
+    let waitTime = 0;
     const socket = io();
     EngineClass = class extends GameEngine {
       addEvent(...args) {
@@ -21,7 +22,11 @@ $(() => {
       Object.assign(currentGame, data.game);
       currentGame.importCache(data.cache);
       frameRate = data.frameRate;
-      mainLoop = window.setInterval(step, 1000 / frameRate);
+      mainLoop = window.setInterval(() => {
+        if (waitTime-- <= 0) {
+          step();
+        }
+      }, 1000 / frameRate);
     });
 
     // We expect the browser clock to run slower than
@@ -31,6 +36,7 @@ $(() => {
       while (currentGame.time < serverTime) {
         step();
       }
+      waitTime = currentGame.time - serverTime;
     });
 
     socket.on('game event', (data) => {
