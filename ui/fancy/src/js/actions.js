@@ -1,25 +1,25 @@
 module.exports = {
   moveSwapperLeft(ui) {
     if (ui.isGameRunning) {
-      --ui.swapper.x;
+      --ui.grid.swapper.x;
     }
   },
 
   moveSwapperRight(ui) {
     if (ui.isGameRunning) {
-      ++ui.swapper.x;
+      ++ui.grid.swapper.x;
     }
   },
 
   moveSwapperUp(ui) {
     if (ui.isGameRunning) {
-      --ui.swapper.y;
+      --ui.grid.swapper.y;
     }
   },
 
   moveSwapperDown(ui) {
     if (ui.isGameRunning) {
-      ++ui.swapper.y;
+      ++ui.grid.swapper.y;
     }
   },
 
@@ -28,16 +28,16 @@ module.exports = {
       let { x, y } = actionArguments;
 
       if (x == null || y == null) {
-        [x, y] = [ui.swapper.x, ui.swapper.y];
+        [x, y] = [ui.grid.swapper.x, ui.grid.swapper.y];
       }
-      ui.game.addEvent(ui.game.time, 'swap', x + (y * ui.game.width));
+      ui.game.addEvent(ui.game.time, 'swap', x + (y * ui.grid.width));
     }
   },
 
   addRow(ui) {
     if (ui.isGameRunning) {
       ui.game.addEvent(ui.game.time, 'addRow');
-      --ui.swapper.y;
+      --ui.grid.swapper.y;
     }
   },
 };

@@ -1,6 +1,6 @@
 class Swapper {
-  constructor(userInterface, x, y) {
-    this.userInterface = userInterface;
+  constructor(grid, x, y) {
+    this.grid = grid;
     this.coordinates = { x, y };
   }
 
@@ -9,10 +9,9 @@ class Swapper {
   }
 
   set x(x) {
-    if (x < 0 || x >= this.userInterface.game.width - 1) {
-      return;
+    if (x >= 0 && x < this.grid.width - 1) {
+      this.update({ x });
     }
-    this.update({ x });
   }
 
   get y() {
@@ -20,28 +19,26 @@ class Swapper {
   }
 
   set y(y) {
-    if (y < 0 || y >= this.userInterface.game.height) {
-      return;
+    if (y >= 0 && y < this.grid.height) {
+      this.update({ y });
     }
-    this.update({ y });
   }
 
-  get blockElements() {
+  get blocks() {
     const { x, y } = this.coordinates;
-    const index = x + (y * this.userInterface.game.width);
 
-    return [this.userInterface.blocks[index], this.userInterface.blocks[index + 1]];
+    return [this.grid[y][x], this.grid[y][x + 1]];
   }
 
   update(coordinates) {
     const { x = this.coordinates.x, y = this.coordinates.y } = coordinates;
 
-    this.blockElements.forEach((element) => {
-      element.classList.remove('swapper');
+    this.blocks.forEach((block) => {
+      block.isSwapper = false;
     });
     this.coordinates = { x, y };
-    this.blockElements.forEach((element) => {
-      element.classList.add('swapper');
+    this.blocks.forEach((block) => {
+      block.isSwapper = true;
     });
   }
 }
