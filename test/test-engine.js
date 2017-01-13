@@ -1,11 +1,6 @@
 const GameEngine = require('../lib/engine.js');
-const shuffle = require('../lib/util.js').shuffle;
-
-// Block colors
-const R = 'red';
-const G = 'green';
-const B = 'blue';
-const _ = null;
+const {R, G, B, _} = require('../lib/engine-util.js');
+const {shuffle} = require('lodash');
 
 // Fixed ruleset for dynamic chain tests
 const dynamicOptions = {
@@ -60,30 +55,6 @@ module.exports.testDeterminism = function (test) {
   );
   test.done();
 };
-
-// A helpful debug printer.
-function printColors (game) {
-  let row = '';
-  game.colors.forEach((color, index) => {
-    let block = '_';
-    switch (color) {
-      case R:
-        block = 'R';
-        break;
-      case G:
-        block = 'G';
-        break;
-      case B:
-        block = 'B';
-        break;
-    }
-    row += block + ' ';
-    if (index % game.width === game.width - 1) {
-      console.log(row);
-      row = '';
-    }
-  });
-}
 
 function runGame(game, numSteps) {
   let maxChain = 0;
