@@ -200,6 +200,26 @@ module.exports.testNoFlight = function (test) {
   test.done();
 }
 
+module.exports.testNoPeek = function (test) {
+  const setup = [
+    B, _, _,
+    B, _, B,
+  ];
+  const options = Object.assign(
+    {width: 3, height: 2, colors: setup},
+    dynamicOptions
+  );
+  const game = new GameEngine(options);
+  game.addEvent(0, "swap", 0);
+  game.addEvent(1, "swap", 0);
+  const maxChain = runGame(game, 8);
+
+  test.expect(2);
+  test.strictEqual(maxChain, 0);
+  test.ok(game.colors.every(color => color === null));
+  test.done();
+}
+
 module.exports.testInsertSupport = function (test) {
   const setup = [
     _, G, _, _,
