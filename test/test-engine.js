@@ -1,23 +1,22 @@
 const GameEngine = require('../lib/engine.js');
-const shuffle = require('../lib/util.js').shuffle;
+const {R, G, B, _, blockTypes} = require('../lib/engine-util.js');
+const {shuffle} = require('lodash');
 
-// Block colors
-const R = 'red';
-const G = 'green';
-const B = 'blue';
-const _ = null;
+// Fixed block types for static tests
+const staticOptions = {blockTypes}
 
 // Fixed ruleset for dynamic chain tests
 const dynamicOptions = {
   flashTime: 3,
   floatTime: 3,
   swapTime: 2,
+  blockTypes,
 };
 
 module.exports.testDeterminism = function (test) {
   // Make two copies of the same game.
-  const firstGame = new GameEngine();
-  const secondGame = new GameEngine();
+  const firstGame = new GameEngine(staticOptions);
+  const secondGame = new GameEngine(staticOptions);
   secondGame.importState(firstGame.exportState());
 
   const numBlocks = firstGame.width * firstGame.height;
@@ -61,30 +60,6 @@ module.exports.testDeterminism = function (test) {
   test.done();
 };
 
-// A helpful debug printer.
-function printColors (game) {
-  let row = '';
-  game.colors.forEach((color, index) => {
-    let block = '_';
-    switch (color) {
-      case R:
-        block = 'R';
-        break;
-      case G:
-        block = 'G';
-        break;
-      case B:
-        block = 'B';
-        break;
-    }
-    row += block + ' ';
-    if (index % game.width === game.width - 1) {
-      console.log(row);
-      row = '';
-    }
-  });
-}
-
 function runGame(game, numSteps) {
   let maxChain = 0;
   for (let i = 0; i < numSteps; ++i) {
@@ -101,11 +76,11 @@ module.exports.testHorizontalChain = function (test) {
     _, G, G, R, R, _,
     G, R, R, B, B, B,
   ];
-  const game = new GameEngine({
-    width: 6,
-    height: 2,
-    colors: horizontalSetup,
-  });
+  const options = Object.assign(
+    {width: 6, height: 2, colors: horizontalSetup},
+    staticOptions
+  );
+  const game = new GameEngine(options);
   const maxChain = runGame(game, 100);
 
   test.expect(2);
@@ -126,11 +101,11 @@ module.exports.testVerticalChain = function (test) {
     G,
     B,
   ];
-  const game = new GameEngine({
-    width: 1,
-    height: 9,
-    colors: verticalSetup,
-  });
+  const options = Object.assign(
+    {width: 1,height: 9, colors: verticalSetup},
+    staticOptions
+  )
+  const game = new GameEngine(options);
   const maxChain = runGame(game, 100);
 
   test.expect(2);
@@ -148,11 +123,11 @@ module.exports.testTimeLag = function (test) {
     G, G, G,
     R, B, B,
   ];
-  const game = new GameEngine({
-    width: 3,
-    height: 6,
-    colors: setup,
-  });
+  const options = Object.assign(
+    {width: 3, height: 6, colors: setup},
+    staticOptions
+  );
+  const game = new GameEngine(options);
   const maxChain = runGame(game, 100);
 
   test.expect(2);
