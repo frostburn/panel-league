@@ -1,6 +1,7 @@
 /* eslint-env browser, jquery */
 
 const GameEngine = require('../../../../lib/engine');
+const {random} = require('lodash');
 let EngineClass = GameEngine;
 
 $(() => {
@@ -141,6 +142,16 @@ $(() => {
         $block.text(`${$block.text()}C`);
       }
 
+      if (block.garbage) {
+        const slab = block.slab
+        $block.text('G');
+        if (slab.flashTimer >= 0) {
+          $block.text(`${$block.text()}f`);
+        }
+        const t = (slab.flashTimer < 0) ? slab.flashTime : slab.flashTimer;
+        $block.css('opacity', (slab.flashTime - t) / slab.flashTime * 0.5 + 0.5);
+      }
+
       // Keyboard UI
       const swapperIndex = swapperX + (currentGame.width * swapperY);
       if (i === swapperIndex || i === swapperIndex + 1) {
@@ -217,6 +228,13 @@ $(() => {
     console.log(debugState);
   });
 
+  $('#btn-garbage').click(() => {
+    const width = random(1, currentGame.width);
+    const x = random(0, currentGame.width - width);
+    const height = random(1, 3);
+    currentGame.addEvent(currentGame.time, 'addGarbage', {x, width, height});
+  });
+
   $('#btn-export-replay').click(() => {
     $('#export').val(currentGame.exportState());
   });
@@ -234,8 +252,10 @@ $(() => {
     window.clearInterval(mainLoop);
     currentGame = new EngineClass({
       flashTime: 40,
-      floatTime: 30,
+      floatTime: 20,
       swapTime: 3,
+      garbageFlashTime: 2,
+      blockTypes: ['red', 'gold', 'lawngreen', 'darkcyan', 'blue', 'blueviolet'],
     });
     frameRate = 30;
     mainLoop = window.setInterval(step, 1000 / frameRate);
