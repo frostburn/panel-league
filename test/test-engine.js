@@ -1,4 +1,4 @@
-const GameEngine = require('../lib/engine.js');
+const {GameEngine} = require('../lib/engine.js');
 const {R, G, B, _, blockTypes} = require('../lib/engine-util.js');
 const {shuffle} = require('lodash');
 

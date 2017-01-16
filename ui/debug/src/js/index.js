@@ -1,6 +1,6 @@
 /* eslint-env browser, jquery */
 
-const GameEngine = require('../../../../lib/engine');
+const {GameEngine, ScoringStepper} = require('../../../../lib/engine');
 const {random} = require('lodash');
 let EngineClass = GameEngine;
 
@@ -53,8 +53,12 @@ $(() => {
   }
 
   const $container = $('#game-container');
+  const $effects = $('#game-effects');
   let currentGame = new EngineClass();
   let frameRate = 1;
+
+  // Demo effects.
+  currentGame.on("blockLanded", () => {$effects.append("<li>plop</li>");});
 
   let swapperX = 0;
   let swapperY = 0;
@@ -195,6 +199,7 @@ $(() => {
     // Status info
     $container.append($('<p>', { text: `Chain number: ${state.chainNumber}` }));
     $container.append($('<p>', { text: `Time step: ${state.time}` }));
+    $container.append($('<p>', { text: `Score: ${state.score}` }));
   }
 
   let debugState;
@@ -251,6 +256,7 @@ $(() => {
   $('#btn-rules-easy').click(() => {
     window.clearInterval(mainLoop);
     currentGame = new EngineClass({
+      stepper: ScoringStepper,
       flashTime: 40,
       floatTime: 20,
       swapTime: 3,
