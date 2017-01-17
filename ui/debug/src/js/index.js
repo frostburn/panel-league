@@ -1,6 +1,7 @@
 /* eslint-env browser, jquery */
 
 const {GameEngine, ScoringStepper} = require('../../../../lib/engine');
+const Grid = require('./grid');
 const {random} = require('lodash');
 let EngineClass = GameEngine;
 
@@ -20,7 +21,13 @@ $(() => {
 
     socket.on('connected', (data) => {
       const game = data.game;
+      const stepper = currentGame.stepper;
+      const effects = currentGame.effects;
+      const listeners = currentGame.listeners;
       Object.assign(currentGame, data.game);
+      currentGame.stepper = stepper;
+      currentGame.effects = effects;
+      currentGame.listeners = listeners;
       currentGame.importCache(data.cache);
       frameRate = data.frameRate;
       mainLoop = window.setInterval(() => {
@@ -56,9 +63,11 @@ $(() => {
   const $effects = $('#game-effects');
   let currentGame = new EngineClass();
   let frameRate = 1;
+  const grid = new Grid(currentGame, $container);
 
-  // Demo effects.
-  currentGame.on("blockLanded", () => {$effects.append("<li>plop</li>");});
+
+  // Demo effects. Disabled for being pretty bad.
+  // currentGame.on("blockLanded", () => {$effects.append("<li>plop</li>");});
 
   let swapperX = 0;
   let swapperY = 0;
@@ -67,6 +76,7 @@ $(() => {
 
   // Keyboard input
   $(window).keydown((e) => {
+    displaySwapper('none');
     switch (e.key) {
       case 'ArrowUp':
         if (swapperY > 0) {
@@ -108,98 +118,24 @@ $(() => {
       default:
         break;
     }
+    displaySwapper('solid');
   });
 
+  function displaySwapper(borderStyle) {
+    const index = swapperX + (currentGame.width * swapperY);
+    grid.$blocks[index].css({
+      'border-style': borderStyle,
+      'box-sizing': 'border-box',
+    });
+    grid.$blocks[index + 1].css({
+      'border-style': borderStyle,
+      'box-sizing': 'border-box',
+    });
+  }
+  displaySwapper('solid');
+
   function update(state) {
-    $container.empty();
-    state.blocks.forEach((block, i) => {
-      const $block = $('<div>', {
-        css: {
-          width: '20px',
-          height: '20px',
-          float: 'left',
-        },
-      });
-
-      $block.css('background', block.color || 'transparent');
-      if (block.flashTimer >= 0) {
-        $block.css('opacity', (block.flashTimer + 1) / (state.flashTime + 2));
-      }
-
-      if (block.swapTimer !== 0) {
-        // Add a little extra nudge to make initial swapping visible too.
-        // Make the nudge unsymmetric to avoid the blocks overlapping during the swap.
-        const nudge = (block.swapTimer < 0) ? 0.1 : 0.4;
-        let swapRatio = block.swapTimer / (state.swapTime + nudge);
-        swapRatio *= 20;
-        $block.css('margin-right', swapRatio + "px");
-        $block.css('margin-left', -swapRatio + "px");
-      }
-
-      if (block.floatTimer > 0) {
-        $block.text('F');
-      } else if (block.floatTimer === 0) {
-        $block.text('f');
-      }
-
-      if (block.chaining) {
-        $block.text(`${$block.text()}C`);
-      }
-
-      if (block.garbage) {
-        const slab = block.slab
-        $block.text('G');
-        if (slab.flashTimer >= 0) {
-          $block.text(`${$block.text()}f`);
-        }
-        const t = (slab.flashTimer < 0) ? slab.flashTime : slab.flashTimer;
-        $block.css('opacity', (slab.flashTime - t) / slab.flashTime * 0.5 + 0.5);
-      }
-
-      // Keyboard UI
-      const swapperIndex = swapperX + (currentGame.width * swapperY);
-      if (i === swapperIndex || i === swapperIndex + 1) {
-        $block.css({
-          'border-style': 'solid',
-          'box-sizing': 'border-box',
-        });
-      }
-
-      // Mouse input
-      $block.click((e) => {
-        e.preventDefault();
-        currentGame.addEvent(state.time, 'swap', i);
-      });
-
-      $container.append($block);
-      if (i % currentGame.width === currentGame.width - 1) {
-        $container.append($('<div>', { css: { clear: 'left' } }));
-      }
-    });
-
-    state.nextRow.forEach((block) => {
-      const $block = $('<div>', {
-        css: {
-          width: '20px',
-          height: '20px',
-          float: 'left',
-          background: block.color,
-          opacity: 0.3,
-        },
-      });
-      // Adding new rows
-      $block.click((e) => {
-        e.preventDefault();
-        currentGame.addEvent(state.time, 'addRow');
-      });
-      $container.append($block);
-    });
-    $container.append($('<div>', { css: { clear: 'left' } }));
-
-    // Status info
-    $container.append($('<p>', { text: `Chain number: ${state.chainNumber}` }));
-    $container.append($('<p>', { text: `Time step: ${state.time}` }));
-    $container.append($('<p>', { text: `Score: ${state.score}` }));
+    grid.update(state);
   }
 
   let debugState;
@@ -251,6 +187,7 @@ $(() => {
     window.clearInterval(mainLoop);
     currentGame = new EngineClass();
     frameRate = 1;
+    grid.game = currentGame;
     mainLoop = window.setInterval(step, 1000 / frameRate);
   });
   $('#btn-rules-easy').click(() => {
@@ -264,6 +201,15 @@ $(() => {
       blockTypes: ['red', 'gold', 'lawngreen', 'darkcyan', 'blue', 'blueviolet'],
     });
     frameRate = 30;
+    grid.game = currentGame;
     mainLoop = window.setInterval(step, 1000 / frameRate);
+  });
+
+  $('#btn-bonus-game').click(() => {
+    const $bonusContainer = $('<div>');
+    const bonusGame = new EngineClass();
+    const bonusGrid = new Grid(bonusGame, $bonusContainer);
+    $('body').append($bonusContainer);
+    window.setInterval(() => {bonusGrid.update(bonusGame.step())}, 300);
   });
 });

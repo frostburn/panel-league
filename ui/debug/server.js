@@ -24,7 +24,7 @@ io.on('connection', (socket) => {
   });
 });
 
-const GameEngine = require('../../lib/engine');
+const {GameEngine} = require('../../lib/engine');
 const mainGame = new GameEngine();
 
 function step() {
