@@ -19,7 +19,7 @@ io.on('connection', (socket) => {
     cache: mainGame.exportCache(),
   });
   socket.on('game event', (data) => {
-    mainGame.addEvent(...data.event);
+    mainGame.addEvent(data.event);
     socket.broadcast.emit('game event', data);
   });
 });
