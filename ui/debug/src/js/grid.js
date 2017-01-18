@@ -48,13 +48,20 @@ class Grid {
     this.$blocks.forEach(($block, index) => {
       $block.click((ev) => {
         ev.preventDefault();
-        this.game.addEvent(this.game.time, 'swap', index);
+        this.game.addEvent({
+          time: this.game.time,
+          type: 'swap',
+          index
+        });
       });
     });
     this.$previewBlocks.forEach(($block) => {
       $block.click((ev) => {
         ev.preventDefault();
-        this.game.addEvent(this.game.time, 'addRow');
+        this.game.addEvent({
+          time: this.game.time,
+          type: 'addRow'
+        });
       });
     });
     $container.append(this.$chainNumber, this.$time, this.$score);

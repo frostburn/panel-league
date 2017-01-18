@@ -26,21 +26,28 @@ module.exports.testDeterminism = function (test) {
   for (let i = 0; i < 1000; ++i) {
     const eventTime = parseInt(Math.random() * 50);
     if (Math.random() < 0.9) {
-      events.push([eventTime, "swap", parseInt(Math.random() * numBlocks)]);
+      events.push({
+        time: eventTime,
+        type: "swap",
+        index: parseInt(Math.random() * numBlocks)
+      });
     }
     else {
-      events.push([eventTime, "addRow"]);
+      events.push({
+        time: eventTime,
+        type: "addRow"
+      });
     }
   }
 
   // Play the events on the first game.
   events.forEach((event) => {
-    firstGame.addEvent(...event);
+    firstGame.addEvent(event);
   });
   // Scramble the events and play them back on the second game.
   shuffle(events);
   events.forEach((event) => {
-    secondGame.addEvent(...event);
+    secondGame.addEvent(event);
   });
 
   // The engine is supposed to be deterministic so the final states should agree.
@@ -146,7 +153,11 @@ module.exports.testMovingWhileFlashing = function (test) {
     dynamicOptions
   );
   const game = new GameEngine(options);
-  game.addEvent(1, "swap", 0);
+  game.addEvent({
+    time: 1,
+    type: "swap",
+    index: 0
+  });
   const maxChain = runGame(game, 12);
 
   test.expect(2);
@@ -165,8 +176,16 @@ module.exports.testNoFlight = function (test) {
     dynamicOptions
   );
   const game = new GameEngine(options);
-  game.addEvent(0, "swap", 0);
-  game.addEvent(1, "swap", 1);
+  game.addEvent({
+    time: 0,
+    type: "swap",
+    index: 0
+  });
+  game.addEvent({
+    time: 1,
+    type: "swap",
+    index: 1
+  });
   const maxChain = runGame(game, 8);
 
   test.expect(2);
@@ -185,8 +204,16 @@ module.exports.testNoPeek = function (test) {
     dynamicOptions
   );
   const game = new GameEngine(options);
-  game.addEvent(0, "swap", 0);
-  game.addEvent(1, "swap", 0);
+  game.addEvent({
+    time: 0,
+    type: "swap",
+    index: 0
+  });
+  game.addEvent({
+    time: 1,
+    type: "swap",
+    index: 0
+  });
   const maxChain = runGame(game, 8);
 
   test.expect(2);
@@ -211,7 +238,11 @@ module.exports.testInsertSupport = function (test) {
   test.expect(2 * timeRange);
   for (let time = 4; time < 4 + timeRange; ++time) {
     const game = new GameEngine(options);
-    game.addEvent(time, "swap", 8);
+    game.addEvent({
+      time,
+      type: "swap",
+      index: 8
+    });
     const maxChain = runGame(game, 16);
 
     test.strictEqual(maxChain, 1);
@@ -237,7 +268,11 @@ module.exports.testInsertChain = function (test) {
   test.expect(2 * timeRange);
   for (let time = 4; time < 4 + timeRange; ++time) {
     const game = new GameEngine(options);
-    game.addEvent(time, "swap", 4);
+    game.addEvent({
+      time,
+      type: "swap",
+      index: 4
+    });
     const maxChain = runGame(game, 16);
 
     test.strictEqual(maxChain, 1);
@@ -261,7 +296,11 @@ module.exports.testFallThrough = function (test) {
   test.expect(timeRange);
   for (let time = 0; time < timeRange; ++time) {
     const game = new GameEngine(options);
-    game.addEvent(time, "swap", 0);
+    game.addEvent({
+      time,
+      type: "swap",
+      index: 0
+    });
     const maxChain = runGame(game, 12);
     test.strictEqual(maxChain, 1);
   }
@@ -285,7 +324,11 @@ module.exports.testFallOn = function (test) {
   test.expect(2 * timeRange);
   for (let time = 0; time < timeRange; ++time) {
     const game = new GameEngine(options);
-    game.addEvent(time, "swap", 3);
+    game.addEvent({
+      time,
+      type: "swap",
+      index: 3
+    });
     runGame(game, 9);
     test.strictEqual(game.colors[12], B);
     const maxChain = runGame(game, 3);
@@ -311,7 +354,11 @@ module.exports.testLateSlip = function (test) {
   test.expect(timeRange);
   for (let time = 8; time < 8 + timeRange; ++time) {
     const game = new GameEngine(options);
-    game.addEvent(time, "swap", 12);
+    game.addEvent({
+      time,
+      type: "swap",
+      index: 12
+    });
     const maxChain = runGame(game, 22);
     test.strictEqual(maxChain, 2);
   }

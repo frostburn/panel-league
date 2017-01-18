@@ -5,7 +5,11 @@ const {R, G, B, _} = require('../lib/engine-util.js');
 module.exports.testAdd = ((test) => {
   const game = new GameEngine();
 
-  game.addEvent(0, 'addGarbage', {x: 0, width: game.width, height: 1});
+  game.addEvent({
+    time: 0,
+    type: 'addGarbage',
+    slab: {x: 0, width: game.width, height: 1}
+  });
   game.step();
   const state = game.step();
   test.expect(1);
@@ -16,8 +20,16 @@ module.exports.testAdd = ((test) => {
 module.exports.testFit = ((test) => {
   const game = new GameEngine({initialRows: 0, width: 6});
 
-  game.addEvent(0, 'addGarbage', {x: 0, width: 2, height: 1});
-  game.addEvent(1, 'addGarbage', {x: 2, width: 2, height: 2});
+  game.addEvent({
+    time: 0,
+    type: 'addGarbage',
+    slab: {x: 0, width: 2, height: 1}
+  });
+  game.addEvent({
+    time: 1,
+    type: 'addGarbage',
+    slab: {x: 2, width: 2, height: 2}
+  });
 
   times(100, () => game.step());
   state = game.step();
@@ -34,8 +46,16 @@ module.exports.testFit = ((test) => {
 module.exports.testOverhang = ((test) => {
   const game = new GameEngine({initialRows: 0});
 
-  game.addEvent(0, 'addGarbage', {x: 0, width: 1, height: 2});
-  game.addEvent(1, 'addGarbage', {x: 0, width: game.width, height: 2});
+  game.addEvent({
+    time: 0,
+    type: 'addGarbage',
+    slab: {x: 0, width: 1, height: 2}
+  });
+  game.addEvent({
+    time: 1,
+    type: 'addGarbage',
+    slab: {x: 0, width: game.width, height: 2}
+  });
 
   times(100, () => game.step());
   state = game.step();
@@ -59,9 +79,21 @@ module.exports.testShock = ((test) => {
   ];
   const game = new GameEngine({width: 6, height: 5, colors: setup});
 
-  game.addEvent(0, 'addGarbage', {x: 0, width: game.width, height: 2});
-  game.addEvent(1, 'addGarbage', {x: 0, width: game.width, height: 2});
-  game.addEvent(101, 'swap', 24);
+  game.addEvent({
+    time: 0,
+    type: 'addGarbage',
+    slab: {x: 0, width: game.width, height: 2}
+  });
+  game.addEvent({
+    time: 1,
+    type: 'addGarbage',
+    slab: {x: 0, width: game.width, height: 2}
+  });
+  game.addEvent({
+    time: 101,
+    type: 'swap',
+    index: 24
+  });
 
   test.expect(2 + 2 * game.width);
   times(99, () => game.step());

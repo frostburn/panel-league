@@ -10,12 +10,12 @@ $(() => {
     let waitTime = 0;
     const socket = io();
     EngineClass = class extends GameEngine {
-      addEvent(...args) {
-        super.addEvent(...args);
-        socket.emit('game event', {'event': args});
+      addEvent(event) {
+        super.addEvent(event);
+        socket.emit('game event', {'event': event});
       }
-      addBroadcastEvent(...args) {
-        super.addEvent(...args);
+      addBroadcastEvent(event) {
+        super.addEvent(event);
       }
     };
 
@@ -48,7 +48,7 @@ $(() => {
     });
 
     socket.on('game event', (data) => {
-      currentGame.addBroadcastEvent(...data.event);
+      currentGame.addBroadcastEvent(data.event);
     });
 
     // These features are not available when running in slave mode.
@@ -104,15 +104,18 @@ $(() => {
 
       // The f key was chosen as it is in a natural position for the left hand.
       case 'f':
-        currentGame.addEvent(
-          currentGame.time,
-          'swap',
-          swapperX + (currentGame.width * swapperY)
-        );
+        currentGame.addEvent({
+          time: currentGame.time,
+          type: 'swap',
+          index: swapperX + (currentGame.width * swapperY)
+        });
         break;
 
       case ' ':
-        currentGame.addEvent(currentGame.time, 'addRow');
+        currentGame.addEvent({
+          time: currentGame.time,
+          type: 'addRow'
+        });
         break;
 
       default:
@@ -173,7 +176,11 @@ $(() => {
     const width = random(1, currentGame.width);
     const x = random(0, currentGame.width - width);
     const height = random(1, 3);
-    currentGame.addEvent(currentGame.time, 'addGarbage', {x, width, height});
+    currentGame.addEvent({
+      time: currentGame.time,
+      type: 'addGarbage',
+      slab: {x, width, height}
+    });
   });
 
   $('#btn-export-replay').click(() => {
