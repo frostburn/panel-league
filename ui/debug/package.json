@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "build": "./node_modules/.bin/webpack",
-    "watch": "./node_modules/.bin/webpack -d --watch"
+    "watch": "./node_modules/.bin/webpack -d --watch",
+    "vs": "node server_vs.js"
   },
   "dependencies": {
     "express": "^4.10.2",

@@ -37,8 +37,6 @@ $(() => {
       }, 1000 / frameRate);
     });
 
-    // We expect the browser clock to run slower than
-    // the server clock so we only implement catch up.
     socket.on('clock', (data) => {
       const serverTime = data.time;
       while (currentGame.time < serverTime) {
