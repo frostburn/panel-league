@@ -12,7 +12,7 @@ const $newBlock = (() => {
 });
 
 class Grid {
-  constructor(game, $container) {
+  constructor(game, $container, player) {
     this.game = game;
     this.width = game.width;
     this.height = game.height;
@@ -44,26 +44,29 @@ class Grid {
       $previewRow.append($block);
       this.$previewBlocks.push($block);
     }
-
-    this.$blocks.forEach(($block, index) => {
-      $block.click((ev) => {
-        ev.preventDefault();
-        this.game.addEvent({
-          time: this.game.time,
-          type: 'swap',
-          index
+    if (player !== null) {
+      this.$blocks.forEach(($block, index) => {
+        $block.click((ev) => {
+          ev.preventDefault();
+          this.game.addEvent({
+            player: player,
+            time: this.game.time,
+            type: 'swap',
+            index
+          });
         });
       });
-    });
-    this.$previewBlocks.forEach(($block) => {
-      $block.click((ev) => {
-        ev.preventDefault();
-        this.game.addEvent({
-          time: this.game.time,
-          type: 'addRow'
+      this.$previewBlocks.forEach(($block) => {
+        $block.click((ev) => {
+          ev.preventDefault();
+          this.game.addEvent({
+            player: player,
+            time: this.game.time,
+            type: 'addRow'
+          });
         });
       });
-    });
+    }
     $container.append(this.$chainNumber, this.$time, this.$score);
   }
 
