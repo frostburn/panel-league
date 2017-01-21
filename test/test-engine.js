@@ -1,5 +1,5 @@
 const {GameEngine} = require('../lib/engine.js');
-const {R, G, B, _, blockTypes} = require('../lib/engine-util.js');
+const {R, G, B, _, blockTypes, printColors} = require('../lib/engine-util.js');
 const {shuffle} = require('lodash');
 
 // Fixed block types for static tests
@@ -361,6 +361,37 @@ module.exports.testLateSlip = function (test) {
     });
     const maxChain = runGame(game, 22);
     test.strictEqual(maxChain, 2);
+  }
+  test.done();
+}
+
+module.exports.testNoZeroFallChain = function (test) {
+  const setup = [
+    _, R, _, _,
+    R, B, B, B,
+    G, R, G, G,
+  ];
+  const options = Object.assign(
+    {width: 4, height: 3, colors: setup},
+    dynamicOptions
+  );
+  const timeRange = 10;
+  test.expect(2 * timeRange);
+  for (let time = 1; time < 2 + timeRange; ++time) {
+    if (time === 7) {
+      // It would be nice to prevent this one too, but having
+      // "zero fall" as a one frame tech is fine I guess.
+      continue;
+    }
+    const game = new GameEngine(options);
+    game.addEvent({
+      time,
+      type: "swap",
+      index: 4
+    });
+    const maxChain = runGame(game, 20);
+    test.strictEqual(maxChain, 0);
+    test.ok(game.colors.some(block => block === R));
   }
   test.done();
 }
