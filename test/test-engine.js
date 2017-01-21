@@ -395,3 +395,28 @@ module.exports.testNoZeroFallChain = function (test) {
   }
   test.done();
 }
+
+module.exports.testCatch = function (test) {
+  const setup = [
+    _, G,
+    _, R,
+    G, R,
+    G, R,
+  ];
+  const options = Object.assign(
+    {width: 2, height: 4, colors: setup},
+    dynamicOptions
+  );
+  const game = new GameEngine(options);
+  game.addEvent({
+    time: 8,
+    type: "swap",
+    index: 2
+  });
+  const maxChain = runGame(game, 20);;
+
+  test.expect(2);
+  test.strictEqual(maxChain, 1);
+  test.ok(game.colors.every(color => color === null));
+  test.done();
+}
