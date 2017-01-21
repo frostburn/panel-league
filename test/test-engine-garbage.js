@@ -1,4 +1,4 @@
-const {times} = require('lodash');
+const times = require('lodash/times');
 const {GameEngine} = require('../lib/engine.js');
 const {R, G, B, _} = require('../lib/engine-util.js');
 
