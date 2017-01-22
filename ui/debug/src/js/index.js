@@ -2,7 +2,8 @@
 
 const {GameEngine, ScoringStepper} = require('../../../../lib/engine');
 const Grid = require('./grid');
-const {random} = require('lodash');
+const soundEffects = require('./sound-effects');
+const random = require('lodash/random');
 let EngineClass = GameEngine;
 
 $(() => {
@@ -64,8 +65,23 @@ $(() => {
   const grid = new Grid(currentGame, $container);
 
 
-  // Demo effects. Disabled for being pretty bad.
-  // currentGame.on("blockLanded", () => {$effects.append("<li>plop</li>");});
+  // Sound effects.
+  currentGame.on('blockLanded', () => {
+    soundEffects.ping(400 + Math.random() * 10, 0.1 + Math.random() * 0.02, 10);
+  });
+  currentGame.on('flashDone', () => {
+    soundEffects.buzz(20, 0.2, 0.2);
+  });
+  currentGame.on('matchMade', () => {
+    soundEffects.pow(200, 0.15, 30);
+  });
+  currentGame.on('chainMatchMade', (effect) => {
+    soundEffects.pow(300 + 25 * effect.chainNumber, 0.15, 20);
+  });
+  currentGame.on('chainDone', (effect) => {
+    const freqs = Array.from([1, 1.5, 2], (f) => (220 + 20 * effect.chainNumber) * f);
+    soundEffects.fanfare(freqs, 0.2, 0.5);
+  });
 
   let swapperX = 0;
   let swapperY = 0;
@@ -189,13 +205,16 @@ $(() => {
   });
 
   $('#btn-rules-debug').click(() => {
+    const listeners = currentGame.listeners;
     window.clearInterval(mainLoop);
     currentGame = new EngineClass();
+    currentGame.listeners = listeners;
     frameRate = 1;
     grid.game = currentGame;
     mainLoop = window.setInterval(step, 1000 / frameRate);
   });
   $('#btn-rules-easy').click(() => {
+    const listeners = currentGame.listeners;
     window.clearInterval(mainLoop);
     currentGame = new EngineClass({
       stepper: ScoringStepper,
@@ -205,6 +224,7 @@ $(() => {
       garbageFlashTime: 2,
       blockTypes: ['red', 'gold', 'lawngreen', 'darkcyan', 'blue', 'blueviolet'],
     });
+    currentGame.listeners = listeners;
     frameRate = 30;
     grid.game = currentGame;
     mainLoop = window.setInterval(step, 1000 / frameRate);

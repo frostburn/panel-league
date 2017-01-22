@@ -1,6 +1,6 @@
 const {GameEngine} = require('../lib/engine.js');
 const {R, G, B, _, blockTypes, printColors} = require('../lib/engine-util.js');
-const {shuffle} = require('lodash');
+const shuffle = require('lodash/shuffle');
 
 // Fixed block types for static tests
 const staticOptions = {blockTypes}
