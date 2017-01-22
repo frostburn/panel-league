@@ -1,6 +1,5 @@
 const {GameEngine} = require('../lib/engine.js');
-const {R, G, B, _, blockTypes, printColors} = require('../lib/engine-util.js');
-const shuffle = require('lodash/shuffle');
+const {R, G, B, _, blockTypes, printColors, shuffleInPlace} = require('../lib/engine-util.js');
 
 // Fixed block types for static tests
 const staticOptions = {blockTypes}
@@ -45,7 +44,7 @@ module.exports.testDeterminism = function (test) {
     firstGame.addEvent(event);
   });
   // Scramble the events and play them back on the second game.
-  shuffle(events);
+  shuffleInPlace(events, Math.random);
   events.forEach((event) => {
     secondGame.addEvent(event);
   });
