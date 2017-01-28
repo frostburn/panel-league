@@ -67,10 +67,10 @@ $(() => {
 
   // Sound effects.
   currentGame.on('blockLanded', () => {
-    soundEffects.ping(400 + Math.random() * 10, 0.1 + Math.random() * 0.02, 10);
+    soundEffects.ping(400 + Math.random() * 10, 0.1 + Math.random() * 0.02, 0.5);
   });
   currentGame.on('flashDone', () => {
-    soundEffects.buzz(20, 0.2, 0.2);
+    soundEffects.buzz(20, 0.2, 0.25);
   });
   currentGame.on('matchMade', () => {
     soundEffects.pow(200, 0.15, 30);

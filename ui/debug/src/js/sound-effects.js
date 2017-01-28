@@ -8,6 +8,9 @@ if (isFunction(AudioContext)) {
 }
 
 const playData = ((data) => {
+  if (!audioCtx) {
+    return;
+  }
   const numChannels = 1;
   const buffer = audioCtx.createBuffer(numChannels, data.length, sampleRate);
   const source = audioCtx.createBufferSource();
@@ -20,42 +23,60 @@ const playData = ((data) => {
   }, 1000 * data.length / sampleRate + 100);
 });
 
-const envelope = ((t) => t * Math.exp(1 - t));
-
-module.exports.ping = ((frequency, volume, decay) => {
+const playFunction = ((func, duration) => {
   if (!audioCtx) {
     return;
   }
-  const duration = 5 / decay;
-  const data = new Float32Array(duration * sampleRate);
-  for (let i = 0; i < data.length; ++i) {
-    const t = i / sampleRate;
-    data[i] = Math.sin(2 * Math.PI * frequency * t) * Math.exp(-decay * t) * volume;
+  const processor = audioCtx.createScriptProcessor();
+  processor.connect(audioCtx.destination)
+
+  let index = 0;
+  processor.onaudioprocess = ((event) => {
+    const buffer = event.outputBuffer.getChannelData(0);
+    for (let i = 0; i < buffer.length; ++i) {
+        const t = index / sampleRate;
+        buffer[i] = func(t);
+        ++index;
+    }
+  });
+  setTimeout(() => {
+    processor.disconnect();
+  }, 1000 * duration);
+});
+
+const envelope = ((t) => t * Math.exp(1 - t));
+const sine = ((phase) => Math.sin(2 * Math.PI * phase));
+
+module.exports.ping = ((frequency, volume, duration) => {
+  if (!audioCtx) {
+    return;
   }
-  playData(data);
+  const oscillator = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  oscillator.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  oscillator.type = 'sine';
+  oscillator.frequency.value = frequency;
+  gain.gain.value = volume;
+  gain.gain.exponentialRampToValueAtTime(0.01 * volume, audioCtx.currentTime + duration);
+
+  oscillator.start();
+  oscillator.stop(audioCtx.currentTime + duration);
+  setTimeout(() => {
+    oscillator.disconnect();
+    gain.disconnect();
+  }, 1000 * duration);
 });
 
 module.exports.pow = ((frequency, volume, decay) => {
-  if (!audioCtx) {
-    return;
-  }
-  const duration = 5 / decay;
-  const data = new Float32Array(duration * sampleRate);
-  for (let i = 0; i < data.length; ++i) {
-    const t = i / sampleRate;
-    data[i] = Math.tanh(Math.sin(2 * Math.PI * frequency * Math.exp(-t)) * Math.exp(2-decay * t)) * volume;
-  }
-  playData(data);
+  playFunction((t) => (
+    Math.tanh(sine(frequency * Math.exp(-t)) * Math.exp(2 - decay * t)) * volume
+  ), 5 / decay);
 });
 
-
 module.exports.fanfare = ((frequencies, volume, duration) => {
-  if (!audioCtx) {
-    return;
-  }
-  const data = new Float32Array((duration + 0.5) * sampleRate);
-  for (let i = 0; i < data.length; ++i) {
-    const t = i / sampleRate;
+  playFunction((t) => {
     result = 0;
     frequencies.forEach((freq, index) => {
       const mu = duration * index / frequencies.length;
@@ -65,20 +86,12 @@ module.exports.fanfare = ((frequencies, volume, duration) => {
         result += envelope(15 * lt) * Math.sin(p + Math.sin(3 * p));
       }
     });
-    data[i] = result * volume;
-  }
-  playData(data);
+    return result * volume;
+  }, duration + 0.5);
 });
 
 module.exports.buzz = ((frequency, volume, duration) => {
-  if (!audioCtx) {
-    return;
-  }
-  duration *= 1.2;
-  const data = new Float32Array(duration * sampleRate);
-  for (let i = 0; i < data.length; ++i) {
-    const t = i / sampleRate;
-    data[i] = Math.sin(2 * Math.PI * t * frequency) * envelope(3 * t / duration) * Math.random() * volume;
-  }
-  playData(data);
+  playFunction((t) => (
+    sine(frequency * t) * envelope(3 * t / duration) * Math.random() * volume
+  ), duration * 1.2);
 });
