@@ -62,7 +62,7 @@ $(() => {
   const $effects = $('#game-effects');
   let currentGame = new EngineClass();
   let frameRate = 1;
-  const grid = new Grid(currentGame, $container);
+  let grid = new Grid(currentGame, $container);
 
 
   // Sound effects.
@@ -91,6 +91,7 @@ $(() => {
   // Keyboard input
   $(window).keydown((e) => {
     displaySwapper('none');
+    let doPreventDefault = true;
     switch (e.key) {
       case 'ArrowUp':
         if (swapperY > 0) {
@@ -125,6 +126,13 @@ $(() => {
         });
         break;
 
+      case 'r':
+        currentGame.addEvent({
+          time: currentGame.time,
+          type: 'refill',
+        });
+        break;
+
       case ' ':
         currentGame.addEvent({
           time: currentGame.time,
@@ -133,7 +141,11 @@ $(() => {
         break;
 
       default:
+        doPreventDefault = false;
         break;
+    }
+    if (doPreventDefault) {
+      e.preventDefault();
     }
     displaySwapper('solid');
   });
@@ -218,15 +230,20 @@ $(() => {
     window.clearInterval(mainLoop);
     currentGame = new EngineClass({
       stepper: ScoringStepper,
+      width: 6,
+      height: 12,
       flashTime: 40,
-      floatTime: 20,
+      floatTime: 10,
       swapTime: 3,
       garbageFlashTime: 2,
       blockTypes: ['red', 'gold', 'lawngreen', 'darkcyan', 'blue', 'blueviolet'],
+      addRowWhileActive: false,
+      scoringSystem: 'tetrisAttack',
     });
     currentGame.listeners = listeners;
     frameRate = 30;
-    grid.game = currentGame;
+    $container.empty();
+    grid = new Grid(currentGame, $container);
     mainLoop = window.setInterval(step, 1000 / frameRate);
   });
 
