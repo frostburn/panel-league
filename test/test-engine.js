@@ -423,3 +423,31 @@ module.exports.testCatch = function (test) {
   test.ok(game.colors.every(color => color === null));
   test.done();
 }
+
+module.exports.testSupportWithFall = function (test) {
+  const setup = [
+    _, G, _,
+    G, R, _,
+    B, R, G,
+    R, R, B,
+  ];
+  const options = Object.assign(
+    {width: 3, height: 4, colors: setup},
+    dynamicOptions
+  );
+
+  const timeRange = 5;
+  test.expect(2 * timeRange);
+  for (let time = 4; time < 4 + timeRange; ++time) {
+    const game = new GameEngine(options);
+    game.addEvent({
+      time,
+      type: "swap",
+      index: 6
+    });
+    const maxChain = runGame(game, 20);
+    test.strictEqual(maxChain, 1);
+    test.ok(game.colors.every(block => block !== G));
+  }
+  test.done();
+}
