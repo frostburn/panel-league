@@ -1,7 +1,7 @@
 const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
-const {GameEngine, VsStepper} = require('../../lib/engine');
+const {GameEngine} = require('../../lib/engine');
 
 app.get('/', (req, res) => {
   res.sendFile(`${__dirname}/dist/index_vs.html`);
@@ -20,7 +20,7 @@ io.on('connection', (socket) => {
   else {
     console.log('New game starting');
     const game = new GameEngine({
-      stepper: VsStepper,
+      stepper: 'panelLeagueVs',
       flashTime: 40,
       floatTime: 10,
       swapTime: 3,

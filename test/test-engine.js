@@ -1,5 +1,5 @@
 const {GameEngine} = require('../lib/engine');
-const {R, G, B, _, blockTypes, printColors, shuffleInPlace} = require('../lib/panel-league/util');
+const {R, G, B, _, blockTypes, getColors, printColors, shuffleInPlace} = require('../lib/panel-league/util');
 
 // Fixed block types for static tests
 const staticOptions = {blockTypes}
@@ -91,7 +91,7 @@ module.exports.testHorizontalChain = function (test) {
 
   test.expect(2);
   test.strictEqual(maxChain, 2);
-  test.ok(game.colors.every(color => color === null));
+  test.ok(getColors(game).every(color => color === null));
   test.done();
 }
 
@@ -116,7 +116,7 @@ module.exports.testVerticalChain = function (test) {
 
   test.expect(2);
   test.strictEqual(maxChain, 2);
-  test.ok(game.colors.every(color => color === null));
+  test.ok(getColors(game).every(color => color === null));
   test.done();
 }
 
@@ -138,7 +138,7 @@ module.exports.testTimeLag = function (test) {
 
   test.expect(2);
   test.strictEqual(maxChain, 2);
-  test.ok(game.colors.every(color => color === null));
+  test.ok(getColors(game).every(color => color === null));
   test.done();
 }
 
@@ -161,7 +161,7 @@ module.exports.testMovingWhileFlashing = function (test) {
 
   test.expect(2);
   test.strictEqual(maxChain, 1);
-  test.ok(game.colors.every(color => color === null));
+  test.ok(getColors(game).every(color => color === null));
   test.done();
 }
 
@@ -189,7 +189,7 @@ module.exports.testNoFlight = function (test) {
 
   test.expect(2);
   test.strictEqual(maxChain, 0);
-  test.ok(game.colors.every(color => color === null));
+  test.ok(getColors(game).every(color => color === null));
   test.done();
 }
 
@@ -220,7 +220,7 @@ module.exports.testNoPeek = function (test) {
     const maxChain = runGame(game, 16);
 
     test.strictEqual(maxChain, 0);
-    test.ok(game.colors.every(color => color === null));
+    test.ok(getColors(game).every(color => color === null));
   }
   test.done();
 }
@@ -249,7 +249,7 @@ module.exports.testInsertSupport = function (test) {
     const maxChain = runGame(game, 16);
 
     test.strictEqual(maxChain, 1);
-    test.ok(game.colors.every(color => color !== G));
+    test.ok(getColors(game).every(color => color !== G));
   }
   test.done();
 }
@@ -279,7 +279,7 @@ module.exports.testInsertChain = function (test) {
     const maxChain = runGame(game, 16);
 
     test.strictEqual(maxChain, 1);
-    test.ok(game.colors.every(color => color !== G));
+    test.ok(getColors(game).every(color => color !== G));
   }
   test.done();
 }
@@ -333,7 +333,7 @@ module.exports.testFallOn = function (test) {
       index: 3
     });
     runGame(game, 9);
-    test.strictEqual(game.colors[12], B);
+    test.strictEqual(getColors(game)[12], B);
     const maxChain = runGame(game, 3);
     test.strictEqual(maxChain, 1);
   }
@@ -394,7 +394,7 @@ module.exports.testNoZeroFallChain = function (test) {
     });
     const maxChain = runGame(game, 20);
     test.strictEqual(maxChain, 0);
-    test.ok(game.colors.some(block => block === R));
+    test.ok(getColors(game).some(block => block === R));
   }
   test.done();
 }
@@ -420,7 +420,7 @@ module.exports.testCatch = function (test) {
 
   test.expect(2);
   test.strictEqual(maxChain, 1);
-  test.ok(game.colors.every(color => color === null));
+  test.ok(getColors(game).every(color => color === null));
   test.done();
 }
 
@@ -447,7 +447,7 @@ module.exports.testSupportWithFall = function (test) {
     });
     const maxChain = runGame(game, 20);
     test.strictEqual(maxChain, 1);
-    test.ok(game.colors.every(block => block !== G));
+    test.ok(getColors(game).every(block => block !== G));
   }
   test.done();
 }
