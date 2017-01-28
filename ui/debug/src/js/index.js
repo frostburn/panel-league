@@ -1,6 +1,6 @@
 /* eslint-env browser, jquery */
 
-const {GameEngine, ScoringStepper} = require('../../../../lib/engine');
+const {GameEngine} = require('../../../../lib/engine');
 const Grid = require('./grid');
 const soundEffects = require('./sound-effects');
 const random = require('lodash/random');
@@ -229,7 +229,7 @@ $(() => {
     const listeners = currentGame.listeners;
     window.clearInterval(mainLoop);
     currentGame = new EngineClass({
-      stepper: ScoringStepper,
+      stepper: 'panelLeagueScoring',
       width: 6,
       height: 12,
       flashTime: 40,
