@@ -1,21 +1,25 @@
 /* eslint-env browser */
 
-const GameEngine = require('../../../../lib/engine');
-const Grid = require('./grid');
+const { GameEngine } = require('../../../../lib/engine');
 
 const keyBindingMap = require('./keybindings');
 const actionMap = require('./actions');
 
+
 class UserInterface {
   constructor() {
-    this.game = new GameEngine();
+    this.container = document.getElementById('container');
+
+    this.socket = null;
+    this.game = null;
+    this.gameMode = null;
     this.gameLoop = null;
+    this.waitTime = 0;
+
     this.gamepadSupport = {
       devices: {},
       previousTimestamps: {},
     };
-    this.frameRate = 30;
-    this.grid = new Grid(this, this.game.width, this.game.height);
   }
 
   get isGameRunning() {
@@ -23,17 +27,40 @@ class UserInterface {
   }
 
   install() {
-    this.installDOMElements();
+    this.installSocket();
     this.installEventListeners();
-    this.installGameLoop();
   }
 
-  installDOMElements() {
-    this.grid.installDOMElements(document.body);
+  installSocket() {
+    if (typeof window.io !== 'function') {
+      throw new Error('Unable to initialize socket');
+    }
+    this.socket = window.io();
+    this.socket.on('connected', (data) => {
+      if (this.game != null) {
+        throw new Error('Game is already running');
+      }
+      this.game = GameEngine.unserialize(data.game);
+      // TODO: frame rates and shit
+    });
+    this.socket.on('clock', (data) => {
+      const serverTime = data.time;
+
+      if (this.game) {
+        while (this.game.time < serverTime) {
+          this.step();
+        }
+        this.waitTime = this.game.time - serverTime;
+      }
+    });
+    this.socket.on('game event', (data) => {
+      if (this.game) {
+        // TODO: this.game.addBroadcastEvent(data.event);
+      }
+    });
   }
 
   installEventListeners() {
-    this.grid.installEventListeners();
     window.addEventListener('keydown', (ev) => {
       const actionName = keyBindingMap[ev.key];
 
@@ -51,18 +78,6 @@ class UserInterface {
     window.addEventListener('gamepaddisconnected', (ev) => {
       delete this.gamepadSupport.devices[ev.gamepad.index];
     });
-  }
-
-  installGameLoop() {
-    this.grid.update(this.game.step());
-    this.gameLoop = window.setInterval(() => {
-      if (this.isGameRunning) {
-        this.grid.update(this.game.step());
-      } else {
-        window.clearInterval(this.gameLoop);
-        this.gameLoop = null;
-      }
-    }, 1000 / this.frameRate);
   }
 
   installGamepadListener() {
@@ -107,6 +122,26 @@ class UserInterface {
     gamepadListener();
   }
 
+  installGameLoop(frameRate) {
+    if (this.gameLoop != null) {
+      throw new Error('Game loop has already been installed');
+    }
+    this.gameLoop = window.setInterval(() => {
+      if (this.isGameRunning) {
+        if (this.waitTime-- <= 0) {
+          this.step();
+        }
+      } else {
+        window.clearInterval(this.gameLoop);
+        this.gameLoop = null;
+      }
+    }, 1000 / frameRate);
+  }
+
+  step() {
+    // TODO
+  }
+
   action(actionName, actionArguments = {}) {
     const actionCallback = actionMap[actionName];
 
@@ -115,5 +150,40 @@ class UserInterface {
     }
   }
 }
+
+/*class UserInterface {
+  constructor() {
+    this.game = new GameEngine();
+    this.frameRate = 30;
+    this.grid = new Grid(this, this.game.width, this.game.height);
+  }
+
+  install() {
+    this.installSocket();
+    this.installDOMElements();
+    this.installEventListeners();
+    this.installGameLoop();
+  }
+
+  installDOMElements() {
+    this.grid.installDOMElements(document.body);
+  }
+
+  installEventListeners() {
+    this.grid.installEventListeners();
+  }
+
+  installGameLoop() {
+    this.grid.update(this.game.step());
+    this.gameLoop = window.setInterval(() => {
+      if (this.isGameRunning) {
+        this.grid.update(this.game.step());
+      } else {
+        window.clearInterval(this.gameLoop);
+        this.gameLoop = null;
+      }
+    }, 1000 / this.frameRate);
+  }
+}*/
 
 module.exports = UserInterface;
