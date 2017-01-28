@@ -202,22 +202,26 @@ module.exports.testNoPeek = function (test) {
     {width: 3, height: 2, colors: setup},
     dynamicOptions
   );
-  const game = new GameEngine(options);
-  game.addEvent({
-    time: 0,
-    type: "swap",
-    index: 0
-  });
-  game.addEvent({
-    time: 1,
-    type: "swap",
-    index: 0
-  });
-  const maxChain = runGame(game, 8);
 
-  test.expect(2);
-  test.strictEqual(maxChain, 0);
-  test.ok(game.colors.every(color => color === null));
+  const timeRange = 6;
+  test.expect(2 * timeRange);
+  for (let time = 1; time < 1 + timeRange; ++time) {
+    const game = new GameEngine(options);
+    game.addEvent({
+      time: 0,
+      type: "swap",
+      index: 0
+    });
+    game.addEvent({
+      time,
+      type: "swap",
+      index: 0
+    });
+    const maxChain = runGame(game, 16);
+
+    test.strictEqual(maxChain, 0);
+    test.ok(game.colors.every(color => color === null));
+  }
   test.done();
 }
 
