@@ -1,5 +1,5 @@
-const {GameEngine} = require('../lib/engine.js');
-const {R, G, B, _, blockTypes, printColors, shuffleInPlace} = require('../lib/engine-util.js');
+const {GameEngine} = require('../lib/engine');
+const {R, G, B, _, blockTypes, printColors, shuffleInPlace} = require('../lib/panel-league/util');
 
 // Fixed block types for static tests
 const staticOptions = {blockTypes}

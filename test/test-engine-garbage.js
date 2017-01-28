@@ -1,6 +1,6 @@
 const times = require('lodash/times');
-const {GameEngine} = require('../lib/engine.js');
-const {R, G, B, _} = require('../lib/engine-util.js');
+const {GameEngine} = require('../lib/engine');
+const {R, G, B, _} = require('../lib/panel-league/util');
 
 module.exports.testAdd = ((test) => {
   const game = new GameEngine();
