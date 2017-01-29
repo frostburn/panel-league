@@ -13,8 +13,13 @@ class Grid {
     this.previewBlocks = [];
     this.previewRowElement = document.createElement('div');
     this.previewRowElement.classList.add('row', 'preview');
-    this.previousChainNumber = 0;
     this.swapper = new Swapper(this, 0, 0);
+
+    userInterface.game.on('chainMatchMade', (effect) => {
+      // Match indices are sorted and we take the one closest to the top.
+      const chainingBlockIndex = effect.indices[0];
+      this.blocks[chainingBlockIndex].showTooltip(`${effect.chainNumber}`);
+    });
   }
 
   installDOMElements(parentElement) {
@@ -68,15 +73,6 @@ class Grid {
     state.nextRow.forEach((block, index) => {
       this.previewBlocks[index].color = block.color;
     });
-
-    if (state.chainNumber > 0 && state.chainNumber !== this.previousChainNumber) {
-      const chainingBlockIndex = state.blocks.findIndex((block) => block.chaining);
-
-      if (chainingBlockIndex >= 0) {
-        this.blocks[chainingBlockIndex].showTooltip(`${state.chainNumber}`);
-      }
-    }
-    this.previousChainNumber = state.chainNumber;
   }
 }
 
