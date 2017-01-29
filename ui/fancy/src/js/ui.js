@@ -1,6 +1,6 @@
 /* eslint-env browser */
 
-const GameEngine = require('../../../../lib/engine');
+const {GameEngine} = require('../../../../lib/engine');
 const Grid = require('./grid');
 
 const keyBindingMap = require('./keybindings');

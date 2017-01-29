@@ -30,13 +30,20 @@ module.exports = {
       if (x == null || y == null) {
         [x, y] = [ui.grid.swapper.x, ui.grid.swapper.y];
       }
-      ui.game.addEvent(ui.game.time, 'swap', x + (y * ui.grid.width));
+      ui.game.addEvent({
+        time: ui.game.time,
+        type: 'swap',
+        index: x + (y * ui.grid.width)
+      });
     }
   },
 
   addRow(ui) {
     if (ui.isGameRunning) {
-      ui.game.addEvent(ui.game.time, 'addRow');
+      ui.game.addEvent({
+        time: ui.game.time,
+        type: 'addRow'
+      });
       --ui.grid.swapper.y;
     }
   },
