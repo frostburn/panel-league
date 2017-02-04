@@ -44,7 +44,15 @@ module.exports = {
         time: ui.game.time,
         type: 'addRow'
       });
-      --ui.grid.swapper.y;
+    }
+  },
+
+  refill(ui) {
+    if (ui.isGameRunning) {
+      ui.game.addEvent({
+        time: ui.game.time,
+        type: 'refill'
+      });
     }
   },
 };

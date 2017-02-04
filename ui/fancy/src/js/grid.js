@@ -20,10 +20,20 @@ class Grid {
       const chainingBlockIndex = effect.indices[0];
       this.blocks[chainingBlockIndex].showTooltip(`${effect.chainNumber}`);
     });
+
+    userInterface.game.on('addRow', () => --this.swapper.y, false);
   }
 
   installDOMElements(parentElement) {
+    const scoreElement = document.createElement('div');
+    const scoreDisplayElement = document.createElement('span');
     const gridElement = document.createElement('div');
+
+    this.scoreDisplayElement = scoreDisplayElement;
+    scoreDisplayElement.innerHTML = "Score 0";
+    scoreElement.classList.add('score');
+    scoreElement.appendChild(scoreDisplayElement);
+    parentElement.appendChild(scoreElement);
 
     gridElement.classList.add('grid');
     parentElement.appendChild(gridElement);
@@ -69,10 +79,13 @@ class Grid {
   update(state) {
     state.blocks.forEach((block, index) => {
       this.blocks[index].color = block.color;
+      this.blocks[index].isFlashing = (block.flashTimer >= 0);
+      this.blocks[index].swapRatio = block.swapTimer / state.swapTime;
     });
     state.nextRow.forEach((block, index) => {
       this.previewBlocks[index].color = block.color;
     });
+    this.scoreDisplayElement.innerHTML = `Score ${state.score}`;
   }
 }
 

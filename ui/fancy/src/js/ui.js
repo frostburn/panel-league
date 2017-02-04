@@ -6,15 +6,28 @@ const Grid = require('./grid');
 const keyBindingMap = require('./keybindings');
 const actionMap = require('./actions');
 
+const gameOptions = {
+  stepper: 'panelLeagueScoring',
+  width: 6,
+  height: 12,
+  flashTime: 80,
+  floatTime: 20,
+  swapTime: 4,
+  garbageFlashTime: 2,
+  blockTypes: ['red', 'green', 'blue', 'violet', 'yellow', 'navy'],
+  addRowWhileActive: false,
+  scoringSystem: 'tetrisAttack',
+};
+
 class UserInterface {
   constructor() {
-    this.game = new GameEngine();
+    this.game = new GameEngine(gameOptions);
     this.gameLoop = null;
     this.gamepadSupport = {
       devices: {},
       previousTimestamps: {},
     };
-    this.frameRate = 30;
+    this.frameRate = 60;
     this.grid = new Grid(this, this.game.width, this.game.height);
   }
 

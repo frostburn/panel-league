@@ -6,6 +6,7 @@ module.exports = {
 
   f: 'swap',
   ' ': 'addRow',
+  r: 'refill',
 
   // Vi key bindings which are far more superior than arrow keys.
   h: 'moveSwapperLeft',

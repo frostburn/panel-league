@@ -1,6 +1,6 @@
 /* eslint-env browser */
 
-const BLOCK_COLORS = ['red', 'green', 'blue'];
+const BLOCK_COLORS = ['red', 'green', 'blue', 'violet', 'yellow', 'navy'];
 
 
 class Block {
@@ -36,6 +36,23 @@ class Block {
     if (value && !this.element.classList.contains(value)) {
       this.element.classList.add(value);
     }
+  }
+
+  get isFlashing() {
+    return this.element.classList.contains('flashing');
+  }
+
+  set isFlashing(value) {
+    if (!this.isFlashing && value) {
+      this.element.classList.add('flashing');
+    }
+    else if (this.isFlashing && !value) {
+      this.element.classList.remove('flashing');
+    }
+  }
+
+  set swapRatio(value) {
+    this.element.style.transform = `translateX(${-100*value}%)`;
   }
 
   showTooltip(text) {
