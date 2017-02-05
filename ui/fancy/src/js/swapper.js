@@ -4,6 +4,25 @@ class Swapper {
     this.coordinates = { x, y };
   }
 
+  installDOMElements(parentElement) {
+    const eyes = [
+      document.createElement('div'),
+      document.createElement('div'),
+    ];
+
+    this.element = document.createElement('div');
+    this.element.classList.add('row');
+    eyes.forEach((eye) => {
+      eye.classList.add('block');
+      eye.classList.add('swapper');
+      this.element.appendChild(eye);
+    });
+    this.element.style.position = 'absolute';
+    this.element.style.zIndex = 200;
+    parentElement.appendChild(this.element);
+    this.update(this.coordinates);
+  }
+
   get x() {
     return this.coordinates.x;
   }
@@ -24,22 +43,12 @@ class Swapper {
     }
   }
 
-  get blocks() {
-    const { x, y } = this.coordinates;
-
-    return [this.grid[y][x], this.grid[y][x + 1]];
-  }
-
   update(coordinates) {
     const { x = this.coordinates.x, y = this.coordinates.y } = coordinates;
 
-    this.blocks.forEach((block) => {
-      block.isSwapper = false;
-    });
     this.coordinates = { x, y };
-    this.blocks.forEach((block) => {
-      block.isSwapper = true;
-    });
+    this.element.style.left = `${x * 2.5}em`;
+    this.element.style.top = `${y * 2.5}em`;
   }
 }
 

@@ -1,3 +1,5 @@
+const random = require('lodash/random');
+
 module.exports = {
   moveSwapperLeft(ui) {
     if (ui.isGameRunning) {
@@ -55,4 +57,17 @@ module.exports = {
       });
     }
   },
+
+  addGarbage(ui) {
+    if (ui.isGameRunning) {
+      const width = random(1, ui.game.width);
+      const x = random(0, ui.game.width - width);
+      const height = random(1, 3);
+      ui.game.addEvent({
+        time: ui.game.time,
+        type: 'addGarbage',
+        slab: {x, width, height}
+      });
+    }
+  }
 };

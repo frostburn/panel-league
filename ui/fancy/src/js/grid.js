@@ -14,6 +14,7 @@ class Grid {
     this.previewRowElement = document.createElement('div');
     this.previewRowElement.classList.add('row', 'preview');
     this.swapper = new Swapper(this, 0, 0);
+    this.garbageElements = [];
 
     userInterface.game.on('chainMatchMade', (effect) => {
       // Match indices are sorted and we take the one closest to the top.
@@ -58,9 +59,10 @@ class Grid {
       this.previewRowElement.appendChild(block.element);
       this.previewBlocks[x] = block;
     }
-    this.swapper.blocks.forEach((block) => {
-      block.isSwapper = true;
-    });
+
+    this.gridElement = gridElement;
+
+    this.swapper.installDOMElements(gridElement);
   }
 
   installEventListeners() {
@@ -86,6 +88,28 @@ class Grid {
       this.previewBlocks[index].color = block.color;
     });
     this.scoreDisplayElement.innerHTML = `Score ${state.score}`;
+    this.updateGarbage(state);
+  }
+
+  updateGarbage(state) {
+    // Variadic garbage slabs.
+    while (this.garbageElements.length < state.garbage.length) {
+      const newElement = document.createElement('div');
+      newElement.classList.add('garbage');
+      this.gridElement.appendChild(newElement);
+      this.garbageElements.push(newElement);
+    }
+    while (this.garbageElements.length > state.garbage.length) {
+      this.gridElement.removeChild(this.garbageElements.pop());
+    }
+    state.garbage.forEach((slab, index) => {
+      const slabElement = this.garbageElements[index];
+      const top = state.height - slab.y - slab.height;
+      slabElement.style.width = `${slab.width * 2.5}em`;
+      slabElement.style.height = `${slab.height * 2.5}em`;
+      slabElement.style.left = `${slab.x * 2.5}em`;
+      slabElement.style.top = `${top * 2.5}em`;
+    });
   }
 }
 
