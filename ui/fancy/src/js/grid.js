@@ -2,6 +2,7 @@
 
 const Block = require('./block');
 const Swapper = require('./swapper');
+const SVG = require('svg.js');
 
 
 class Grid {
@@ -14,7 +15,7 @@ class Grid {
     this.previewRowElement = document.createElement('div');
     this.previewRowElement.classList.add('row', 'preview');
     this.swapper = new Swapper(this, 0, 0);
-    this.garbageElements = [];
+    this.garbageElements = new Map();
 
     userInterface.game.on('chainMatchMade', (effect) => {
       // Match indices are sorted and we take the one closest to the top.
@@ -91,25 +92,54 @@ class Grid {
     this.updateGarbage(state);
   }
 
+  decorateGarbage(element, slab) {
+    const rand = Math.random;
+
+    element.setAttribute("id", slab.uuid);
+    const draw = SVG(slab.uuid);
+    for (let i = 0; i < slab.width * slab.height * 4; ++i) {
+      const color = new SVG.Color({
+        r: 60 + Math.floor(20 * rand()),
+        g: 50 + Math.floor(15 * rand()),
+        b: 40 + Math.floor(10 * rand()),
+      });
+      const circle = draw.circle(`${rand()}em`);
+      circle.attr({ fill: color.toHex() });
+      circle.cx(`${rand() * slab.width * 2.5}em`)
+      circle.cy(`${rand() * slab.height * 2.5}em`);
+    }
+  }
+
+  getOrCreateGarbageElement(slab) {
+    if (this.garbageElements.has(slab.uuid)) {
+      return this.garbageElements.get(slab.uuid);
+    }
+    const newElement = document.createElement('div');
+    newElement.classList.add('garbage');
+    this.gridElement.appendChild(newElement);
+    this.garbageElements.set(slab.uuid, newElement);
+    this.decorateGarbage(newElement, slab);
+    return newElement;
+  }
+
+  // Variadic garbage slabs.
   updateGarbage(state) {
-    // Variadic garbage slabs.
-    while (this.garbageElements.length < state.garbage.length) {
-      const newElement = document.createElement('div');
-      newElement.classList.add('garbage');
-      this.gridElement.appendChild(newElement);
-      this.garbageElements.push(newElement);
-    }
-    while (this.garbageElements.length > state.garbage.length) {
-      this.gridElement.removeChild(this.garbageElements.pop());
-    }
-    state.garbage.forEach((slab, index) => {
-      const slabElement = this.garbageElements[index];
+    const unusedIds = new Set(this.garbageElements.keys());
+
+    state.garbage.forEach((slab) => {
+      const slabElement = this.getOrCreateGarbageElement(slab);
       const top = state.height - slab.y - slab.height;
+
+      unusedIds.delete(slab.uuid);
       slabElement.style.width = `${slab.width * 2.5}em`;
       slabElement.style.height = `${slab.height * 2.5}em`;
       slabElement.style.left = `${slab.x * 2.5}em`;
       slabElement.style.top = `${top * 2.5}em`;
     });
+    for (let uuid of unusedIds.values()) {
+      this.gridElement.removeChild(this.garbageElements.get(uuid));
+      this.garbageElements.delete(uuid);
+    };
   }
 }
 

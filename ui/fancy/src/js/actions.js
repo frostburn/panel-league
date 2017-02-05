@@ -1,4 +1,5 @@
 const random = require('lodash/random');
+const uuidV4 = require('uuid/v4');
 
 module.exports = {
   moveSwapperLeft(ui) {
@@ -63,10 +64,13 @@ module.exports = {
       const width = random(1, ui.game.width);
       const x = random(0, ui.game.width - width);
       const height = random(1, 3);
+      const uuid = uuidV4();
+
+      // UUID is injected for the UI only.
       ui.game.addEvent({
         time: ui.game.time,
         type: 'addGarbage',
-        slab: {x, width, height}
+        slab: {x, width, height, uuid}
       });
     }
   }
