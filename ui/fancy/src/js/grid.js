@@ -59,11 +59,10 @@ class Grid {
       this.previewRowElement.appendChild(block.element);
       this.previewBlocks[x] = block;
     }
-    this.swapper.blocks.forEach((block) => {
-      block.isSwapper = true;
-    });
 
     this.gridElement = gridElement;
+
+    this.swapper.installDOMElements(gridElement);
   }
 
   installEventListeners() {

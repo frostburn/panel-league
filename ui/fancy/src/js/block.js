@@ -11,18 +11,6 @@ class Block {
     this.element.classList.add('block');
   }
 
-  get isSwapper() {
-    return this.element.classList.contains('swapper');
-  }
-
-  set isSwapper(value) {
-    if (value) {
-      this.element.classList.add('swapper');
-    } else {
-      this.element.classList.remove('swapper');
-    }
-  }
-
   get color() {
     return BLOCK_COLORS.find((color) => this.element.classList.contains(color));
   }
