@@ -451,3 +451,30 @@ module.exports.testSupportWithFall = function (test) {
   }
   test.done();
 }
+
+module.exports.testNoChainBleed = function (test) {
+  const setup = [
+    G, _, _,
+    R, B, _,
+    R, R, B,
+    R, B, R,
+  ];
+  const options = Object.assign(
+    {width: 3, height: 4, colors: setup},
+    dynamicOptions
+  );
+
+  const timeRange = 10;
+  test.expect(timeRange);
+  for (let time = 0; time < timeRange; ++time) {
+    const game = new GameEngine(options);
+    game.addEvent({
+      time,
+      type: "swap",
+      index: 7
+    });
+    const maxChain = runGame(game, 20);
+    test.strictEqual(maxChain, 0);
+  }
+  test.done();
+}
