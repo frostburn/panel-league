@@ -195,8 +195,12 @@ body {
 }
 
 .garbage {
+  background: @color-garbage;
+  border-color: @color-garbage-border;
+  border-style: solid;
+  border-width: @garbage-border-width;
+  border-radius: @garbage-border-radius;
   position: absolute;
   z-index: 100;
-  background: @color-garbage;
-  border-radius: 0.3em;
+  overflow: hidden;
 }
