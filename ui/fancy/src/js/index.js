@@ -2,7 +2,7 @@
 
 require('../css/style.less');
 
-const {UserInterface, VsUserInterface} = require('./ui');
+const { UserInterface, VsUserInterface } = require('./ui');
 
 const initialize = () => {
   if (window.io) {

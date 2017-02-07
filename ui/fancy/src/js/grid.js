@@ -1,8 +1,9 @@
 /* eslint-env browser */
 
+const svg = require('svg.js');
+
 const Block = require('./block');
 const Swapper = require('./swapper');
-const SVG = require('svg.js');
 
 
 class Grid {
@@ -19,7 +20,7 @@ class Grid {
     this.garbageElements = new Map();
 
     userInterface.game.on('chainMatchMade', (effect) => {
-      if (effect.player !== undefined && effect.player != this.player) {
+      if (effect.player !== undefined && effect.player !== this.player) {
         return;
       }
       // Match indices are sorted and we take the one closest to the top.
@@ -28,10 +29,10 @@ class Grid {
     });
 
     userInterface.game.on('addRow', (effect) => {
-      if (effect.player !== undefined && effect.player != this.player) {
+      if (effect.player !== undefined && effect.player !== this.player) {
         return;
       }
-      --this.swapper.y
+      --this.swapper.y;
     }, false);
   }
 
@@ -41,7 +42,7 @@ class Grid {
     const gridElement = document.createElement('div');
 
     this.scoreDisplayElement = scoreDisplayElement;
-    scoreDisplayElement.innerHTML = "Score 0";
+    scoreDisplayElement.innerHTML = 'Score 0';
     scoreElement.classList.add('score');
     scoreElement.appendChild(scoreDisplayElement);
     parentElement.appendChild(scoreElement);
@@ -103,32 +104,35 @@ class Grid {
 
   decorateGarbage(element, slab) {
     const rand = Math.random;
+    const draw = svg(slab.uuid);
 
-    element.setAttribute("id", slab.uuid);
-    const draw = SVG(slab.uuid);
+    element.setAttribute('id', slab.uuid);
     for (let i = 0; i < slab.width * slab.height * 4; ++i) {
-      const color = new SVG.Color({
+      const color = new svg.Color({
         r: 60 + Math.floor(20 * rand()),
         g: 50 + Math.floor(15 * rand()),
         b: 40 + Math.floor(10 * rand()),
       });
       const circle = draw.circle(`${rand()}em`);
+
       circle.attr({ fill: color.toHex() });
-      circle.cx(`${rand() * slab.width * 2.5}em`)
+      circle.cx(`${rand() * slab.width * 2.5}em`);
       circle.cy(`${rand() * slab.height * 2.5}em`);
     }
   }
 
   getOrCreateGarbageElement(slab) {
-    if (this.garbageElements.has(slab.uuid)) {
-      return this.garbageElements.get(slab.uuid);
+    let element = this.garbageElements.get(slab.uuid);
+
+    if (!element) {
+      element = document.createElement('div');
+      element.classList.add('garbage');
+      this.gridElement.appendChild(element);
+      this.garbageElements.set(slab.uuid, element);
+      this.decorateGarbage(element, slab);
     }
-    const newElement = document.createElement('div');
-    newElement.classList.add('garbage');
-    this.gridElement.appendChild(newElement);
-    this.garbageElements.set(slab.uuid, newElement);
-    this.decorateGarbage(newElement, slab);
-    return newElement;
+
+    return element;
   }
 
   // Variadic garbage slabs.
@@ -145,10 +149,10 @@ class Grid {
       slabElement.style.left = `${slab.x * 2.5}em`;
       slabElement.style.top = `${top * 2.5}em`;
     });
-    for (let uuid of unusedIds.values()) {
+    unusedIds.forEach((uuid) => {
       this.gridElement.removeChild(this.garbageElements.get(uuid));
       this.garbageElements.delete(uuid);
-    };
+    });
   }
 }
 

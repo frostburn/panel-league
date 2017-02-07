@@ -33,14 +33,13 @@ class Block {
   set isFlashing(value) {
     if (!this.isFlashing && value) {
       this.element.classList.add('flashing');
-    }
-    else if (this.isFlashing && !value) {
+    } else if (this.isFlashing && !value) {
       this.element.classList.remove('flashing');
     }
   }
 
   set swapRatio(value) {
-    this.element.style.transform = `translateX(${-100*value}%)`;
+    this.element.style.transform = `translateX(${-100 * value}%)`;
   }
 
   showTooltip(text) {

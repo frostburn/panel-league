@@ -37,7 +37,7 @@ module.exports = {
         time: ui.game.time,
         type: 'swap',
         player: ui.player,
-        index: x + (y * ui.grid.width)
+        index: x + (y * ui.grid.width),
       });
     }
   },
@@ -47,7 +47,7 @@ module.exports = {
       ui.game.addEvent({
         time: ui.game.time,
         player: ui.player,
-        type: 'addRow'
+        type: 'addRow',
       });
     }
   },
@@ -57,7 +57,7 @@ module.exports = {
       ui.game.addEvent({
         time: ui.game.time,
         player: ui.player,
-        type: 'refill'
+        type: 'refill',
       });
     }
   },
@@ -74,8 +74,8 @@ module.exports = {
         time: ui.game.time,
         type: 'addGarbage',
         player: ui.player,
-        slab: {x, width, height, uuid}
+        slab: { x, width, height, uuid },
       });
     }
-  }
+  },
 };
