@@ -6,10 +6,11 @@ const SVG = require('svg.js');
 
 
 class Grid {
-  constructor(userInterface, width, height) {
+  constructor(userInterface, width, height, player) {
     this.userInterface = userInterface;
     this.width = width;
     this.height = height;
+    this.player = player;
     this.blocks = [];
     this.previewBlocks = [];
     this.previewRowElement = document.createElement('div');
@@ -18,12 +19,20 @@ class Grid {
     this.garbageElements = new Map();
 
     userInterface.game.on('chainMatchMade', (effect) => {
+      if (effect.player !== undefined && effect.player != this.player) {
+        return;
+      }
       // Match indices are sorted and we take the one closest to the top.
       const chainingBlockIndex = effect.indices[0];
       this.blocks[chainingBlockIndex].showTooltip(`${effect.chainNumber}`);
     });
 
-    userInterface.game.on('addRow', () => --this.swapper.y, false);
+    userInterface.game.on('addRow', (effect) => {
+      if (effect.player !== undefined && effect.player != this.player) {
+        return;
+      }
+      --this.swapper.y
+    }, false);
   }
 
   installDOMElements(parentElement) {

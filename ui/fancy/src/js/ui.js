@@ -19,31 +19,24 @@ const gameOptions = {
   scoringSystem: 'tetrisAttack',
 };
 
-class UserInterface {
+class BaseUserInterface {
   constructor() {
-    this.game = new GameEngine(gameOptions);
+    this.game = null;
     this.gameLoop = null;
     this.gamepadSupport = {
       devices: {},
       previousTimestamps: {},
     };
-    this.frameRate = 60;
-    this.grid = new Grid(this, this.game.width, this.game.height);
+    this.frameRate = null;
+    this.waitTime = 0;
+    this.grid = null;
   }
 
   get isGameRunning() {
     return this.game != null && this.gameLoop != null;
   }
 
-  install() {
-    this.installDOMElements();
-    this.installEventListeners();
-    this.installGameLoop();
-  }
-
-  installDOMElements() {
-    this.grid.installDOMElements(document.body);
-  }
+  install() {}
 
   installEventListeners() {
     this.grid.installEventListeners();
@@ -64,18 +57,6 @@ class UserInterface {
     window.addEventListener('gamepaddisconnected', (ev) => {
       delete this.gamepadSupport.devices[ev.gamepad.index];
     });
-  }
-
-  installGameLoop() {
-    this.grid.update(this.game.step());
-    this.gameLoop = window.setInterval(() => {
-      if (this.isGameRunning) {
-        this.grid.update(this.game.step());
-      } else {
-        window.clearInterval(this.gameLoop);
-        this.gameLoop = null;
-      }
-    }, 1000 / this.frameRate);
   }
 
   installGamepadListener() {
@@ -129,4 +110,129 @@ class UserInterface {
   }
 }
 
-module.exports = UserInterface;
+class UserInterface extends BaseUserInterface {
+  constructor() {
+    super();
+    this.game = new GameEngine(gameOptions);
+    this.frameRate = 60;
+    this.grid = new Grid(this, this.game.width, this.game.height);
+  }
+
+  install() {
+    this.installDOMElements();
+    this.installEventListeners();
+    this.installGameLoop();
+  }
+
+  installDOMElements() {
+    this.grid.installDOMElements(document.body);
+  }
+
+  installGameLoop() {
+    this.grid.update(this.game.step());
+    this.gameLoop = window.setInterval(() => {
+      if (this.isGameRunning) {
+        this.grid.update(this.game.step());
+      } else {
+        window.clearInterval(this.gameLoop);
+        this.gameLoop = null;
+      }
+    }, 1000 / this.frameRate);
+  }
+}
+
+
+class VsUserInterface extends BaseUserInterface{
+  constructor() {
+    super();
+    this.player = null;
+    this.grids = [];
+  }
+
+  postInstall() {
+    this.installDOMElements();
+    this.installEventListeners();
+    this.installGameLoop();
+  }
+
+  install() {
+    const socket = io();
+    class BroadcastEngine extends GameEngine {
+      addEvent(event) {
+        super.addEvent(event);
+        socket.emit('game event', {'event': event});
+      }
+      addBroadcastEvent(event) {
+        super.addEvent(event);
+      }
+    };
+
+    this.waitElement = document.createElement('h1');
+    this.waitElement.innerHTML = 'Waiting for an opponent to join...';
+    document.body.appendChild(this.waitElement);
+
+    socket.on('connected', (data) => {
+      this.player = data.player;
+      this.game = BroadcastEngine.unserialize(data.game);
+      this.frameRate = data.frameRate;
+      this.grids = [
+        new Grid(this, this.game.width, this.game.height, this.player),
+        new Grid(this, this.game.width, this.game.height, 1 - this.player),
+      ];
+      this.grid = this.grids[0];
+      this.postInstall();
+    });
+
+    socket.on('clock', (data) => {
+      if (!this.isGameRunning) {
+        return;
+      }
+      const serverTime = data.time;
+      while (this.game.time < serverTime) {
+        this.step();
+      }
+      this.waitTime = this.game.time - serverTime;
+    });
+
+    socket.on('game event', (data) => {
+      if (!this.isGameRunning) {
+        return;
+      }
+      this.game.addBroadcastEvent(data.event);
+    });
+  }
+
+  installDOMElements() {
+    document.body.removeChild(this.waitElement);
+    this.grids.forEach((grid) => {
+      const columnElement = document.createElement('div');
+
+      columnElement.classList.add('column');
+      document.body.appendChild(columnElement);
+      grid.installDOMElements(columnElement);
+    })
+  }
+
+  installGameLoop() {
+    this.gameLoop = window.setInterval(() => {
+      if (this.isGameRunning) {
+        if (this.waitTime-- <= 0) {
+          this.step();
+        }
+      } else {
+        window.clearInterval(this.gameLoop);
+        this.gameLoop = null;
+      }
+    }, 1000 / this.frameRate);
+  }
+
+  step() {
+    const opponent = 1 - this.player;
+    const states = this.game.step().childStates;
+
+    this.grids[0].update(states[this.player]);
+    this.grids[1].update(states[opponent]);
+  }
+}
+
+module.exports = {UserInterface, VsUserInterface};

@@ -36,6 +36,7 @@ module.exports = {
       ui.game.addEvent({
         time: ui.game.time,
         type: 'swap',
+        player: ui.player,
         index: x + (y * ui.grid.width)
       });
     }
@@ -45,6 +46,7 @@ module.exports = {
     if (ui.isGameRunning) {
       ui.game.addEvent({
         time: ui.game.time,
+        player: ui.player,
         type: 'addRow'
       });
     }
@@ -54,6 +56,7 @@ module.exports = {
     if (ui.isGameRunning) {
       ui.game.addEvent({
         time: ui.game.time,
+        player: ui.player,
         type: 'refill'
       });
     }
@@ -70,6 +73,7 @@ module.exports = {
       ui.game.addEvent({
         time: ui.game.time,
         type: 'addGarbage',
+        player: ui.player,
         slab: {x, width, height, uuid}
       });
     }
