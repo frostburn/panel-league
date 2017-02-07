@@ -1,8 +1,7 @@
 /* eslint-env browser, jquery */
 
-const {GameEngine, VsStepper} = require('../../../../lib/engine');
+const {GameEngine, NetworkGameEngine} = require('../../../../lib/engine');
 const Grid = require('./grid');
-let EngineClass = GameEngine;
 let currentGame;
 let step;
 
@@ -11,21 +10,13 @@ $(() => {
     $('#player-container').text('Waiting for an opponent to join...');
     let waitTime = 0;
     const socket = io();
-    EngineClass = class extends GameEngine {
-      addEvent(event) {
-        super.addEvent(event);
-        socket.emit('game event', {'event': event});
-      }
-      addBroadcastEvent(event) {
-        super.addEvent(event);
-      }
-    };
 
     socket.on('connected', (data) => {
       $('#player-container').empty();
       player = data.player;
       opponent = 1 - player;
-      currentGame = EngineClass.unserialize(data.game);
+      currentGame = NetworkGameEngine.unserialize(data.game);
+      currentGame.installSocket(socket);
       init(player, opponent);
       frameRate = data.frameRate;
       mainLoop = window.setInterval(() => {
@@ -42,18 +33,14 @@ $(() => {
       }
       waitTime = currentGame.time - serverTime;
     });
-
-    socket.on('game event', (data) => {
-      currentGame.addBroadcastEvent(data.event);
-    });
   }
 
   function init(player, opponent) {
     const $playerContainer = $('#player-container');
     const $opponentContainer = $('#opponent-container');
     if (typeof currentGame === 'undefined') {
-      currentGame = new EngineClass({
-        stepper: VsStepper,
+      currentGame = new GameEngine({
+        stepper: "panelLeagueVs",
         flashTime: 40,
         floatTime: 10,
         swapTime: 3,

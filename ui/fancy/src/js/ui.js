@@ -1,6 +1,6 @@
 /* eslint-env browser */
 
-const {GameEngine} = require('../../../../lib/engine');
+const {GameEngine, NetworkGameEngine} = require('../../../../lib/engine');
 const Grid = require('./grid');
 
 const keyBindingMap = require('./keybindings');
@@ -157,15 +157,6 @@ class VsUserInterface extends BaseUserInterface{
 
   install() {
     const socket = io();
-    class BroadcastEngine extends GameEngine {
-      addEvent(event) {
-        super.addEvent(event);
-        socket.emit('game event', {'event': event});
-      }
-      addBroadcastEvent(event) {
-        super.addEvent(event);
-      }
-    };
 
     this.waitElement = document.createElement('h1');
     this.waitElement.innerHTML = 'Waiting for an opponent to join...';
@@ -173,7 +164,8 @@ class VsUserInterface extends BaseUserInterface{
 
     socket.on('connected', (data) => {
       this.player = data.player;
-      this.game = BroadcastEngine.unserialize(data.game);
+      this.game = NetworkGameEngine.unserialize(data.game);
+      this.game.installSocket(socket);
       this.frameRate = data.frameRate;
       this.grids = [
         new Grid(this, this.game.width, this.game.height, this.player),
@@ -192,13 +184,6 @@ class VsUserInterface extends BaseUserInterface{
         this.step();
       }
       this.waitTime = this.game.time - serverTime;
-    });
-
-    socket.on('game event', (data) => {
-      if (!this.isGameRunning) {
-        return;
-      }
-      this.game.addBroadcastEvent(data.event);
     });
   }
 
