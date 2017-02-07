@@ -1,5 +1,6 @@
 const {GameEngine} = require('../lib/engine');
 const {R, G, B, _, blockTypes, getColors, printColors, shuffleInPlace} = require('../lib/panel-league/util');
+const random = require('lodash/random');
 
 // Fixed block types for static tests
 const staticOptions = {blockTypes}
@@ -65,6 +66,20 @@ module.exports.testDeterminism = function (test) {
   );
   test.done();
 };
+
+module.exports.testSerialization = function (test) {
+  const options = Object.assign(
+    {width: random(1, 12), height: random(1, 12)},
+    staticOptions
+  );
+  const game = new GameEngine(options);
+  const data = game.serialize();
+  const unserialized = GameEngine.unserialize(data);
+  test.strictEqual(game.width, unserialized.width);
+  test.strictEqual(game.height, unserialized.height);
+  test.strictEqual(game.initialState, unserialized.initialState);
+  test.done();
+}
 
 function runGame(game, numSteps) {
   let maxChain = 0;

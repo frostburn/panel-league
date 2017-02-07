@@ -2,10 +2,14 @@
 
 require('../css/style.less');
 
-const UserInterface = require('./ui');
+const {UserInterface, VsUserInterface} = require('./ui');
 
 const initialize = () => {
-  (new UserInterface()).install();
+  if (window.io) {
+    (new VsUserInterface()).install();
+  } else {
+    (new UserInterface()).install();
+  }
 };
 
 if (document.readyState !== 'loading') {
