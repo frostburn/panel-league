@@ -1,3 +1,5 @@
+/* eslint-env browser */
+
 class Swapper {
   constructor(grid, x, y) {
     this.grid = grid;

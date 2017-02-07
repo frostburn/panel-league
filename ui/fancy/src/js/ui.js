@@ -1,6 +1,6 @@
 /* eslint-env browser */
 
-const {GameEngine, NetworkGameEngine} = require('../../../../lib/engine');
+const { GameEngine, NetworkGameEngine } = require('../../../../lib/engine');
 const Grid = require('./grid');
 
 const keyBindingMap = require('./keybindings');
@@ -142,7 +142,7 @@ class UserInterface extends BaseUserInterface {
 }
 
 
-class VsUserInterface extends BaseUserInterface{
+class VsUserInterface extends BaseUserInterface {
   constructor() {
     super();
     this.player = null;
@@ -156,7 +156,7 @@ class VsUserInterface extends BaseUserInterface{
   }
 
   install() {
-    const socket = io();
+    const socket = window.io();
 
     this.waitElement = document.createElement('h1');
     this.waitElement.innerHTML = 'Waiting for an opponent to join...';
@@ -195,7 +195,7 @@ class VsUserInterface extends BaseUserInterface{
       columnElement.classList.add('column');
       document.body.appendChild(columnElement);
       grid.installDOMElements(columnElement);
-    })
+    });
   }
 
   installGameLoop() {
@@ -220,4 +220,5 @@ class VsUserInterface extends BaseUserInterface{
   }
 }
 
-module.exports = {UserInterface, VsUserInterface};
+// FIXME: Split these into individual files/modules.
+module.exports = { UserInterface, VsUserInterface };
