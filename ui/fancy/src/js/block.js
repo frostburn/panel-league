@@ -1,5 +1,7 @@
 /* eslint-env browser */
 
+const { blockSize } = require('./variables');
+
 const BLOCK_COLORS = ['red', 'green', 'blue', 'violet', 'yellow', 'navy'];
 
 
@@ -40,7 +42,11 @@ class Block {
   }
 
   set swapRatio(value) {
-    this.element.style.transform = `translateX(${-100*value}%)`;
+    if (this.element.style.right && !value) {
+      this.element.style.right = 0;
+    } else if (value) {
+      this.element.style.right = `${value * blockSize.value}${blockSize.unit}`;
+    }
   }
 
   showTooltip(text) {
