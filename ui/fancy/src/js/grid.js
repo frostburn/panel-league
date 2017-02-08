@@ -48,6 +48,7 @@ class Grid {
     parentElement.appendChild(scoreElement);
 
     gridElement.classList.add('grid');
+    gridElement.style.width = `${this.width * blockSize.value}${blockSize.unit}`;
     parentElement.appendChild(gridElement);
     for (let y = 0; y < this.height; ++y) {
       const rowElement = document.createElement('div');
