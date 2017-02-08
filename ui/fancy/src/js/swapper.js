@@ -1,3 +1,7 @@
+/* eslint-env browser */
+
+const { blockSize } = require('./variables');
+
 class Swapper {
   constructor(grid, x, y) {
     this.grid = grid;
@@ -47,8 +51,8 @@ class Swapper {
     const { x = this.coordinates.x, y = this.coordinates.y } = coordinates;
 
     this.coordinates = { x, y };
-    this.element.style.left = `${x * 2.5}em`;
-    this.element.style.top = `${y * 2.5}em`;
+    this.element.style.left = `${x * blockSize.value}${blockSize.unit}`;
+    this.element.style.top = `${y * blockSize.value}${blockSize.unit}`;
   }
 }
 

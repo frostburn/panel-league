@@ -1,8 +1,10 @@
 /* eslint-env browser */
 
+const SVG = require('svg.js');
+
 const Block = require('./block');
 const Swapper = require('./swapper');
-const SVG = require('svg.js');
+const { blockSize } = require('./variables');
 
 
 class Grid {
@@ -114,8 +116,8 @@ class Grid {
       });
       const circle = draw.circle(`${rand()}em`);
       circle.attr({ fill: color.toHex() });
-      circle.cx(`${rand() * slab.width * 2.5}em`)
-      circle.cy(`${rand() * slab.height * 2.5}em`);
+      circle.cx(`${rand() * slab.width * blockSize.value}${blockSize.unit}`)
+      circle.cy(`${rand() * slab.height * blockSize.value}${blockSize.unit}`);
     }
   }
 
@@ -140,10 +142,10 @@ class Grid {
       const top = state.height - slab.y - slab.height;
 
       unusedIds.delete(slab.uuid);
-      slabElement.style.width = `${slab.width * 2.5}em`;
-      slabElement.style.height = `${slab.height * 2.5}em`;
-      slabElement.style.left = `${slab.x * 2.5}em`;
-      slabElement.style.top = `${top * 2.5}em`;
+      slabElement.style.width = `${slab.width * blockSize.value}${blockSize.unit}`;
+      slabElement.style.height = `${slab.height * blockSize.value}${blockSize.unit}`;
+      slabElement.style.left = `${slab.x * blockSize.value}${blockSize.unit}`;
+      slabElement.style.top = `${top * blockSize.value}${blockSize.unit}`;
     });
     for (let uuid of unusedIds.values()) {
       this.gridElement.removeChild(this.garbageElements.get(uuid));
