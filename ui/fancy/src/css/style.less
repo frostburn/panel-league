@@ -16,6 +16,22 @@ body {
   }
 }
 
+@keyframes garbage-flashing {
+  to {
+    background-color: lighten(@color-garbage, 30%);
+  }
+}
+
+@keyframes garbage-preview {
+  from {
+    opacity: 0.5;
+  }
+
+  to {
+    opacity: 0.9;
+  }
+}
+
 .column {
   width: 50%;
   float: left;
@@ -166,7 +182,15 @@ body {
 
       &.flashing {
         animation-name: flashing;
-        animation-duration: 0.2s;
+        animation-duration: @animation-duration-flash;
+        animation-iteration-count: infinite;
+        animation-direction: alternate;
+      }
+
+      &.garbage-preview {
+        z-index: @z-index-garbage-preview;
+        animation-name: garbage-preview;
+        animation-duration: @animation-duration-garbage-flash;
         animation-iteration-count: infinite;
         animation-direction: alternate;
       }
@@ -181,7 +205,7 @@ body {
 }
 
 .tooltip {
-  z-index: 999;
+  z-index: @z-index-tooltip;
   width: @block-size;
   height: @block-size;
   max-width: @block-size;
@@ -206,6 +230,13 @@ body {
   border-width: @garbage-border-width;
   border-radius: @garbage-border-radius;
   position: absolute;
-  z-index: 100;
+  z-index: @z-index-garbage;
   overflow: hidden;
+
+  &.flashing {
+    animation-name: garbage-flashing;
+    animation-duration: @animation-duration-garbage-flash;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+  }
 }

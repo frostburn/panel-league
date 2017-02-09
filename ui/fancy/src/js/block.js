@@ -41,6 +41,19 @@ class Block {
     }
   }
 
+  get isGarbagePreview() {
+    return this.element.classList.contains('garbage-preview');
+  }
+
+  set isGarbagePreview(value) {
+    if (!this.isGarbagePreview && value) {
+      this.element.classList.add('garbage-preview');
+    }
+    else if (this.isGarbagePreview && !value) {
+      this.element.classList.remove('garbage-preview');
+    }
+  }
+
   set swapRatio(value) {
     if (this.element.style.right && !value) {
       this.element.style.right = 0;
