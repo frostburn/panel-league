@@ -1,6 +1,7 @@
 /* eslint-env browser */
 
 const {GameEngine, NetworkGameEngine} = require('../../../../lib/engine');
+const KeyAutorepeater = require('./autorepeat');
 const Grid = require('./grid');
 
 const keyBindingMap = require('./keybindings');
@@ -40,14 +41,15 @@ class BaseUserInterface {
 
   installEventListeners() {
     this.grid.installEventListeners();
-    window.addEventListener('keydown', (ev) => {
-      const actionName = keyBindingMap[ev.key];
+    this.autorepeater = new KeyAutorepeater(200, 20);
+    for (let key in keyBindingMap) {
+      const action = keyBindingMap[key];
+      const actionIsRepeatable = (action.slice(0, 4) === 'move');
 
-      if (typeof actionName === 'string') {
-        ev.preventDefault();
-        this.action(actionName);
-      }
-    });
+      this.autorepeater.on(key, () => {
+        this.action(action);
+      }, actionIsRepeatable);
+    }
     window.addEventListener('gamepadconnected', (ev) => {
       this.gamepadSupport.devices[ev.gamepad.index] = ev.gamepad;
       if (Object.keys(this.gamepadSupport.devices).length === 1) {
