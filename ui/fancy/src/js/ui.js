@@ -14,7 +14,7 @@ const gameOptions = {
   flashTime: 80,
   floatTime: 20,
   swapTime: 4,
-  garbageFlashTime: 2,
+  garbageFlashTime: 8,
   blockTypes: ['red', 'green', 'blue', 'violet', 'yellow', 'navy'],
   addRowWhileActive: false,
   scoringSystem: 'tetrisAttack',

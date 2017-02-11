@@ -1,8 +1,7 @@
 /* eslint-env browser */
 
-const SVG = require('svg.js');
-
 const Block = require('./block');
+const GarbageSlab = require('./garbage');
 const Swapper = require('./swapper');
 const { blockSize } = require('./variables');
 
@@ -18,7 +17,7 @@ class Grid {
     this.previewRowElement = document.createElement('div');
     this.previewRowElement.classList.add('row', 'preview');
     this.swapper = new Swapper(this, 0, 0);
-    this.garbageElements = new Map();
+    this.garbageSlabs = new Map();
 
     userInterface.game.on('chainMatchMade', (effect) => {
       if (effect.player !== undefined && effect.player != this.player) {
@@ -92,9 +91,16 @@ class Grid {
 
   update(state) {
     state.blocks.forEach((block, index) => {
+      const slab = block.slab;
+
       this.blocks[index].color = block.color;
       this.blocks[index].isFlashing = (block.flashTimer >= 0);
       this.blocks[index].swapRatio = block.swapTimer / state.swapTime;
+      this.blocks[index].isGarbagePreview = (
+        slab &&
+        slab.flashTimer >= 0 &&
+        index >= state.width * (state.height - slab.y - 1)
+      );
     });
     state.nextRow.forEach((block, index) => {
       this.previewBlocks[index].color = block.color;
@@ -103,53 +109,29 @@ class Grid {
     this.updateGarbage(state);
   }
 
-  decorateGarbage(element, slab) {
-    const rand = Math.random;
-
-    element.setAttribute("id", slab.uuid);
-    const draw = SVG(slab.uuid);
-    for (let i = 0; i < slab.width * slab.height * 4; ++i) {
-      const color = new SVG.Color({
-        r: 60 + Math.floor(20 * rand()),
-        g: 50 + Math.floor(15 * rand()),
-        b: 40 + Math.floor(10 * rand()),
-      });
-      const circle = draw.circle(`${rand()}em`);
-      circle.attr({ fill: color.toHex() });
-      circle.cx(`${rand() * slab.width * blockSize.value}${blockSize.unit}`)
-      circle.cy(`${rand() * slab.height * blockSize.value}${blockSize.unit}`);
+  getOrCreateGarbageSlab(slab) {
+    if (!this.garbageSlabs.has(slab.uuid)) {
+      this.garbageSlabs.set(
+        slab.uuid,
+        new GarbageSlab(this.gridElement, slab)
+      );
     }
-  }
-
-  getOrCreateGarbageElement(slab) {
-    if (this.garbageElements.has(slab.uuid)) {
-      return this.garbageElements.get(slab.uuid);
-    }
-    const newElement = document.createElement('div');
-    newElement.classList.add('garbage');
-    this.gridElement.appendChild(newElement);
-    this.garbageElements.set(slab.uuid, newElement);
-    this.decorateGarbage(newElement, slab);
-    return newElement;
+    return this.garbageSlabs.get(slab.uuid);
   }
 
   // Variadic garbage slabs.
   updateGarbage(state) {
-    const unusedIds = new Set(this.garbageElements.keys());
+    const unusedIds = new Set(this.garbageSlabs.keys());
 
     state.garbage.forEach((slab) => {
-      const slabElement = this.getOrCreateGarbageElement(slab);
-      const top = state.height - slab.y - slab.height;
+      const garbageSlab = this.getOrCreateGarbageSlab(slab);
 
+      garbageSlab.update(state, slab);
       unusedIds.delete(slab.uuid);
-      slabElement.style.width = `${slab.width * blockSize.value}${blockSize.unit}`;
-      slabElement.style.height = `${slab.height * blockSize.value}${blockSize.unit}`;
-      slabElement.style.left = `${slab.x * blockSize.value}${blockSize.unit}`;
-      slabElement.style.top = `${top * blockSize.value}${blockSize.unit}`;
     });
     for (let uuid of unusedIds.values()) {
-      this.gridElement.removeChild(this.garbageElements.get(uuid));
-      this.garbageElements.delete(uuid);
+      this.garbageSlabs.get(uuid).remove();
+      this.garbageSlabs.delete(uuid);
     };
   }
 }
