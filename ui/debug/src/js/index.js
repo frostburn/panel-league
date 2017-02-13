@@ -178,12 +178,10 @@ $(() => {
   }
 
   $('#btn-reset').click(() => {
-    currentGame.invalidateCache();
     currentGame.time = 0;;
   });
   $('#btn-step').click(step);
   $('#btn-back').click(() => {
-    currentGame.invalidateCache();
     currentGame.time -= 2;
     debugState = currentGame.step()
     update(debugState);

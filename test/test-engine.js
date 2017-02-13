@@ -14,22 +14,26 @@ const dynamicOptions = {
 };
 
 module.exports.testDeterminism = function (test) {
-  // Make two copies of the same game.
+  // Make three copies of the same game.
   const firstGame = new GameEngine(staticOptions);
   const secondGame = new GameEngine(staticOptions);
-  secondGame.importState(firstGame.exportState());
-
+  const thirdGame = GameEngine.unserialize(firstGame.serialize());
   const numBlocks = firstGame.width * firstGame.height;
+  const events = [];
+
+  secondGame.importState(firstGame.exportState());
+  thirdGame.stateCacheSize = 3;
+
 
   // Create random events.
-  const events = [];
   for (let i = 0; i < 1000; ++i) {
-    const eventTime = parseInt(Math.random() * 50);
+    const eventTime = random(0, 50);
+
     if (Math.random() < 0.9) {
       events.push({
         time: eventTime,
         type: "swap",
-        index: parseInt(Math.random() * numBlocks)
+        index: random(0, numBlocks),
       });
     }
     else {
@@ -49,6 +53,24 @@ module.exports.testDeterminism = function (test) {
   events.forEach((event) => {
     secondGame.addEvent(event);
   });
+  // Scramble once more and enter the events in a way that breaks caching.
+  shuffleInPlace(events, Math.random);
+  while (thirdGame.time < 100) {
+    let delta = random(-10, 75);
+
+    if (delta > 0) {
+      delta = 0;
+    }
+    thirdGame.time = Math.max(0, thirdGame.time + delta);
+    for (let i = 0; i < 10; ++i) {
+      const event = events.pop();
+
+      if (event) {
+        thirdGame.addEvent(event);
+      }
+    }
+    thirdGame.step();
+  }
 
   // The engine is supposed to be deterministic so the final states should agree.
   for (let i = 0; i < 100; ++i) {
@@ -57,11 +79,17 @@ module.exports.testDeterminism = function (test) {
   }
   let firstState = firstGame.step();
   let secondState = secondGame.step();
+  let thirdState = thirdGame.step();
 
-  test.expect(1);
+  test.expect(2);
   test.strictEqual(
     JSON.stringify(firstState),
     JSON.stringify(secondState),
+    'Indeterministic result'
+  );
+  test.strictEqual(
+    JSON.stringify(firstState),
+    JSON.stringify(thirdState),
     'Indeterministic result'
   );
   test.done();
