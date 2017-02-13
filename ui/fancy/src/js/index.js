@@ -2,11 +2,13 @@
 
 require('../css/style.less');
 
-const {UserInterface, VsUserInterface} = require('./ui');
+const {UserInterface, SandboxUserInterface, VsUserInterface} = require('./ui');
 
 const initialize = () => {
   if (window.io) {
-    (new VsUserInterface()).install();
+    // TODO: Figure out how the server can tell us the game mode.
+    // (new VsUserInterface()).install();
+    (new SandboxUserInterface()).install();
   } else {
     (new UserInterface()).install();
   }

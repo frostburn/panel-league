@@ -144,6 +144,59 @@ class UserInterface extends BaseUserInterface {
 }
 
 
+// TODO: Add a networked UI superclass.
+class SandboxUserInterface extends BaseUserInterface {
+  postInstall() {
+    this.installDOMElements();
+    this.installEventListeners();
+    this.installGameLoop();
+  }
+
+  install() {
+    const socket = io();
+
+    socket.on('connected', (data) => {
+      this.game = NetworkGameEngine.unserialize(data.game);
+      this.game.installSocket(socket);
+      this.frameRate = data.frameRate;
+      this.grid = new Grid(this, this.game.width, this.game.height);
+      this.postInstall();
+    });
+
+    socket.on('clock', (data) => {
+      if (!this.isGameRunning) {
+        return;
+      }
+      const serverTime = data.time;
+      while (this.game.time < serverTime) {
+        this.step();
+      }
+      this.waitTime = this.game.time - serverTime;
+    });
+  }
+
+  installDOMElements() {
+    this.grid.installDOMElements(document.body);
+  }
+
+  installGameLoop() {
+    this.gameLoop = window.setInterval(() => {
+      if (this.isGameRunning) {
+        if (this.waitTime-- <= 0) {
+          this.step();
+        }
+      } else {
+        window.clearInterval(this.gameLoop);
+        this.gameLoop = null;
+      }
+    }, 1000 / this.frameRate);
+  }
+
+  step() {
+    this.grid.update(this.game.step());
+  }
+}
+
 class VsUserInterface extends BaseUserInterface{
   constructor() {
     super();
@@ -222,4 +275,4 @@ class VsUserInterface extends BaseUserInterface{
   }
 }
 
-module.exports = {UserInterface, VsUserInterface};
+module.exports = {UserInterface, SandboxUserInterface, VsUserInterface};
