@@ -177,6 +177,10 @@ class VsUserInterface extends BaseUserInterface{
       this.postInstall();
     });
 
+    socket.on('client error', (data) => {
+      window.alert(`Client side error:\n${data.message}`);
+    });
+
     socket.on('clock', (data) => {
       if (!this.isGameRunning) {
         return;
