@@ -158,7 +158,7 @@ class VsUserInterface extends BaseUserInterface{
   }
 
   install() {
-    const socket = io();
+    const socket = window.io();
 
     this.waitElement = document.createElement('h1');
     this.waitElement.innerHTML = 'Waiting for an opponent to join...';
@@ -177,6 +177,10 @@ class VsUserInterface extends BaseUserInterface{
       this.postInstall();
     });
 
+    socket.on('client error', (data) => {
+      window.alert(`Client side error:\n${data.message}`);
+    });
+
     socket.on('clock', (data) => {
       if (!this.isGameRunning) {
         return;
@@ -187,6 +191,17 @@ class VsUserInterface extends BaseUserInterface{
       }
       this.waitTime = this.game.time - serverTime;
     });
+
+    socket.on('game list', (data) => {
+      const game = data.games.find((game) => game.playerCount < game.maximumPlayerCount);
+
+      if (game) {
+        socket.emit('game join', { id: game.id });
+      } else {
+        socket.emit('game create', { mode: 'vs' });
+      }
+    });
+    socket.emit('game list');
   }
 
   installDOMElements() {
