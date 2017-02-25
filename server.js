@@ -10,13 +10,11 @@ function parseCommandLineArguments() {
   const options = {
     host: null,
     port: 3000,
-    userInterfacePath: path.join(__dirname, 'ui', 'debug', 'dist'),
   };
 
   parser
     .option('-h, --host <host>', 'Hostname to run the HTTPD on')
     .option('-p, --port <port>', 'TCP/IP port to run the HTTPD on')
-    .option('-u, --user-interface <name>', 'name of the user interface to use')
     .parse(process.argv);
 
   if (parser.host) {
@@ -31,16 +29,6 @@ function parseCommandLineArguments() {
       return null;
     }
     options.port = port;
-  }
-  if (parser.userInterface) {
-    const ui = path.join(__dirname, 'ui', parser.userInterface, 'dist');
-
-    if (!fs.statSync(ui).isDirectory()) {
-      process.stderr.write(`Unknown user interface: ${parser.userInterface}\n`);
-
-      return null;
-    }
-    options.userInterfacePath = ui;
   }
 
   return options;
@@ -61,7 +49,7 @@ function launchServer(options) {
       const address = httpServer.address();
       const gameServer = new GameServer();
 
-      app.use(express.static(options.userInterfacePath));
+      app.use(express.static(path.join(__dirname, 'public')));
       webSocketServer.on('connection', (socket) => {
         gameServer.addConnection(socket);
       });

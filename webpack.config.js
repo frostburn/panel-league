@@ -2,10 +2,10 @@ const webpack = require('webpack');
 
 module.exports = {
   entry: [
-    './src/js/index.js',
+    './lib/ui/index.js',
   ],
   output: {
-    filename: './dist/asset/js/index.js',
+    filename: './public/asset/js/index.js',
   },
   module: {
     loaders: [
