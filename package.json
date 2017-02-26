@@ -11,21 +11,36 @@
     "url": "https://github.com/frostburn/panel-league/issues"
   },
   "scripts": {
+    "build": "./node_modules/.bin/webpack",
+    "watch": "./node_modules/.bin/webpack -d --watch",
     "test": "./node_modules/.bin/nodeunit"
   },
   "devDependencies": {
     "eslint": "^3.12.2",
     "eslint-config-airbnb": "^13.0.0",
     "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-jsx-a11y": "^3.0.2",
+    "eslint-plugin-jsx-a11y": "^2.2.3",
     "eslint-plugin-react": "^6.8.0",
     "nodeunit": "^0.9.1"
   },
   "dependencies": {
+    "babel-core": "^6.23.1",
+    "babel-loader": "^6.3.2",
+    "babel-preset-es2015": "^6.22.0",
+    "babel-preset-react": "^6.23.0",
     "commander": "^2.9.0",
+    "css-loader": "^0.26.1",
     "express": "^4.14.0",
+    "less": "^2.7.2",
+    "less-loader": "^2.2.3",
     "lodash": "^4.17.4",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2",
     "socket.io": "^1.7.2",
-    "uuid": "^3.0.1"
+    "style-loader": "^0.13.1",
+    "svg.js": "^2.4.0",
+    "uglify-js": "https://github.com/mishoo/UglifyJS2.git#harmony",
+    "uuid": "^3.0.1",
+    "webpack": "^2.2.0-rc.3"
   }
 }

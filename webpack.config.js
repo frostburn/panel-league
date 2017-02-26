@@ -2,13 +2,21 @@ const webpack = require('webpack');
 
 module.exports = {
   entry: [
-    './src/js/index.js',
+    './lib/ui/index.js',
   ],
   output: {
-    filename: './dist/asset/js/index.js',
+    filename: './public/asset/js/index.js',
   },
   module: {
     loaders: [
+      {
+        test: /\.jsx?$/,
+        loader: 'babel-loader',
+        exclude: /node_modules/,
+        query: {
+          presets: ['es2015', 'react'],
+        },
+      },
       {
         test: /\.less$/,
         loader: 'style-loader!css-loader!less-loader',
