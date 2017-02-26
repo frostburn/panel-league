@@ -1,5 +1,20 @@
-# panel-league
+panel-league
+============
+
 Panel de Pon / Tetris Attack / Puzzle Legue clone in browser
+
+# Asset compilation
+
+User interface code needs to be transpiled and bundled with Webpack. Make sure
+that you have all the dependencies installed by running command `npm install`.
+After that you can use command `npm run build` to compile the assets. You can
+also run `run run watch`, which launches Webpack in watch mode where it
+observes changes made to the user interface files.
+
+# Running the server
+
+After assets have been compiled, you can run command `npm start` and navigate
+to http://localhost:3000/
 
 # Project structure
 
@@ -12,5 +27,5 @@ The steppers themselves only handle potential game state changes and are not fit
 ## lib/server.js, lib/game.js, lib/player.js
 The server code is responsible for adding network support to the engine.
 
-## ui/*
-The different user interfaces handle displaying the current game state to the user and feeding the user input to the engine. A user interface may evolve freely in a main loop or be driven by a server clock.
+## lib/ui/*
+Contains user interface code which is run in the browser acting as a client.
