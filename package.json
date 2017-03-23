@@ -41,6 +41,8 @@
     "svg.js": "^2.4.0",
     "uglify-js": "https://github.com/mishoo/UglifyJS2.git#harmony",
     "uuid": "^3.0.1",
-    "webpack": "^2.2.0-rc.3"
+    "webpack": "^2.2.0-rc.3",
+    "webpack-dev-middleware": "^1.10.1",
+    "webpack-hot-middleware": "^2.17.1"
   }
 }

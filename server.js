@@ -10,11 +10,13 @@ function parseCommandLineArguments() {
   const options = {
     host: null,
     port: 3000,
+    debug: false,
   };
 
   parser
     .option('-h, --host <host>', 'Hostname to run the HTTPD on')
     .option('-p, --port <port>', 'TCP/IP port to run the HTTPD on')
+    .option('-d, --debug', 'Launch server in debug/development mode')
     .parse(process.argv);
 
   if (parser.host) {
@@ -29,6 +31,9 @@ function parseCommandLineArguments() {
       return null;
     }
     options.port = port;
+  }
+  if (parser.debug) {
+    options.debug = true;
   }
 
   return options;
@@ -49,7 +54,31 @@ function launchServer(options) {
       const address = httpServer.address();
       const gameServer = new GameServer();
 
-      app.use(express.static(path.join(__dirname, 'public')));
+      if (options.debug) {
+        const webpack = require('webpack');
+        const webpackDevMiddleware = require('webpack-dev-middleware');
+        const webpackHotMiddleware = require('webpack-hot-middleware');
+        const webpackConfig = require('./webpack.dev.config');
+        const compiler = webpack(webpackConfig);
+
+        app.use(webpackDevMiddleware(
+          compiler,
+          {
+            publicPath: webpackConfig.output.publicPath,
+            stats: {
+              colors: true,
+            },
+          }
+        ));
+        app.use(webpackHotMiddleware(compiler, {
+          log: console.log,
+        }));
+        app.get('/', (req, res) => {
+          res.send(fs.readFileSync('./public/index.html').toString());
+        });
+      } else {
+        app.use(express.static(path.join(__dirname, 'public')));
+      }
       webSocketServer.on('connection', (socket) => {
         gameServer.addConnection(socket);
       });
