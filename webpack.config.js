@@ -2,7 +2,7 @@ const webpack = require('webpack');
 
 module.exports = {
   entry: [
-    './lib/ui/index.js',
+    './lib/ui/index.jsx',
   ],
   output: {
     filename: './public/asset/js/index.js',
