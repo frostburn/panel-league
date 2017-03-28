@@ -22,6 +22,7 @@ module.exports.testDeterminism = function (test) {
   const events = [];
 
   secondGame.importState(firstGame.exportState());
+  secondGame.stepper.test = true;
   thirdGame.stateCacheSize = 3;
 
 
