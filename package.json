@@ -39,7 +39,6 @@
     "redom": "^2.7.1",
     "socket.io": "^1.7.2",
     "style-loader": "^0.13.1",
-    "svg.js": "^2.4.0",
     "uglify-js": "https://github.com/mishoo/UglifyJS2.git#harmony",
     "uuid": "^3.0.1",
     "webpack": "^2.2.0-rc.3",
