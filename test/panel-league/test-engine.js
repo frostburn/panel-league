@@ -1,5 +1,5 @@
-const {GameEngine} = require('../lib/engine');
-const {R, G, B, _, blockTypes, getColors, printColors, shuffleInPlace} = require('../lib/panel-league/util');
+const {GameEngine} = require('../../lib/common/engine');
+const {R, G, B, _, blockTypes, getColors, printColors, shuffleInPlace} = require('../../lib/common/panel-league/util');
 const random = require('lodash/random');
 
 // Fixed block types for static tests
