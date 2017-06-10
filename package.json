@@ -13,7 +13,7 @@
   "scripts": {
     "build": "./node_modules/.bin/webpack",
     "watch": "./node_modules/.bin/webpack -d --watch",
-    "test": "./node_modules/.bin/nodeunit test test/panel-league"
+    "test": "./node_modules/.bin/nodeunit test test/panel-league test/puyo"
   },
   "devDependencies": {
     "eslint": "^3.12.2",
