@@ -1,4 +1,4 @@
-const JKISS31 = require('../lib/jkiss');
+const JKISS31 = require('../lib/common/jkiss');
 
 module.exports.testSerialization = function (test) {
   const j = new JKISS31();
