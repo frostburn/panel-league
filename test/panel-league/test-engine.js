@@ -106,7 +106,7 @@ module.exports.testSerialization = function (test) {
   const unserialized = GameEngine.unserialize(data);
   test.strictEqual(game.width, unserialized.width);
   test.strictEqual(game.height, unserialized.height);
-  test.strictEqual(game.initialState, unserialized.initialState);
+  test.strictEqual(game.initialStateJSON, unserialized.initialStateJSON);
   test.done();
 }
 
