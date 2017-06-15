@@ -72,7 +72,7 @@ module.exports.testEndlessRandom = function (test) {
   }
   test.ok(state.totalScore > 0, 'Score not accumulated');
   test.done();
-}
+};
 
 module.exports.testDuelMirror = function (test) {
   const game = new GameEngine({ stepper: 'puyo:duel' });

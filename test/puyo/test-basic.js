@@ -50,10 +50,13 @@ module.exports.testGravity = function (test) {
   const state = {
     blocks,
     width: 3,
+    height: 3,
+    ghostHeight: 0,
   };
   const effects = basic.handleGravity(state);
+  let numDropped = 0;
 
-  test.expect(5);
+  test.expect(6);
   test.deepEqual(
     state.blocks,
     [
@@ -67,13 +70,36 @@ module.exports.testGravity = function (test) {
     if (effect.type !== 'puyoDropped') {
       return;
     }
+    ++numDropped;
     if (effect.color === 1) {
       test.strictEqual(effect.from, 0, 'Wrong initial index');
       test.strictEqual(effect.to, 6, 'Wrong final index');
     } else if (effect.color === 2) {
       test.strictEqual(effect.from, 4, 'Wrong initial index');
       test.strictEqual(effect.to, 7, 'Wrong final index');
+    } else {
+      test.ok(false, 'Wrong color dropped');
     }
+  });
+  test.strictEqual(numDropped, 2, 'Wrong number of puyos dropped');
+  test.done();
+};
+
+module.exports.testGravityOffscreen = function (test) {
+  const state = {
+    blocks: [1, 0],
+    width: 1,
+    height: 1,
+    ghostHeight: 0,
+  };
+  const effects = basic.handleGravity(state);
+
+  effects.forEach((effect) => {
+    if (effect.type !== 'puyoDropped') {
+      return;
+    }
+    test.strictEqual(effect.from, -1, 'Wrong initial index');
+    test.strictEqual(effect.to, 0, 'Wrong final index');
   });
   test.done();
 };
