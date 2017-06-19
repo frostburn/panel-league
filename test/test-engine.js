@@ -19,7 +19,9 @@ class TestStepper {
     return [];
   }
 
-  postProcess() {}
+  postProcess(state) {
+    state.weakness = 1 / state.power;
+  }
 }
 
 module.exports.testGetStates = function (test) {
@@ -28,21 +30,21 @@ module.exports.testGetStates = function (test) {
   test.expect(5);
   test.deepEqual(
     game.initialState,
-    { time: 0, power: 1 }
+    { time: 0, power: 1, weakness: 1 }
   );
   test.deepEqual(
     game.currentState,
-    { time: 0, power: 1 }
+    { time: 0, power: 1, weakness: 1 }
   );
   test.strictEqual(game.time, 0);
   game.step();
   test.deepEqual(
     game.initialState,
-    { time: 0, power: 1 }
+    { time: 0, power: 1, weakness: 1 }
   );
   test.deepEqual(
     game.currentState,
-    { time: 1, power: 2 }
+    { time: 1, power: 2, weakness: 0.5 }
   );
   test.done();
 };
