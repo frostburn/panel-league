@@ -148,3 +148,61 @@ module.exports.testDuelSymmetry = function (test) {
   test.deepEqual(state.childStates[1], flippedState.childStates[0]);
   test.done();
 };
+
+module.exports.testDuelAllClear = function (test) {
+  const game = new GameEngine({ stepper: 'puyo:duel', targetScore: 1000 });
+
+  game.addEvent({
+    player: 0,
+    time: 0,
+    type: 'addPuyos',
+    blocks: [1, 1, 0, 0, 0, 0],
+  });
+  game.addEvent({
+    player: 0,
+    time: 1,
+    type: 'addPuyos',
+    blocks: [1, 1, 0, 0, 0, 0],
+  });
+
+  game.addEvent({
+    player: 0,
+    time: 10,
+    type: 'addPuyos',
+    blocks: [1, 1, 0, 0, 0, 0],
+  });
+  game.addEvent({
+    player: 0,
+    time: 11,
+    type: 'addPuyos',
+    blocks: [0, 0, 2, 2, 0, 0],
+  });
+  game.addEvent({
+    player: 0,
+    time: 12,
+    type: 'addPuyos',
+    blocks: [1, 1, 0, 0, 0, 0],
+  });
+
+  test.expect(10);
+  let state;
+
+  state = game.step();
+  test.ok(!state.childStates[0].allClearBonus);
+  test.ok(!state.childStates[0].chainAllClearBonus);
+  state = game.step();
+  test.ok(!state.childStates[0].allClearBonus);
+  test.ok(state.childStates[0].chainAllClearBonus);
+  state = game.step();
+  test.ok(state.childStates[0].allClearBonus);
+  test.ok(!state.childStates[0].chainAllClearBonus);
+  test.ok(state.childStates[1].blocks.every(block => block !== -1), 'All clear nuisance received prematurely');
+  for (let i = 0; i < 20; ++i) {
+    state = game.step();
+  }
+  test.ok(!state.childStates[0].allClearBonus);
+  test.ok(!state.childStates[0].chainAllClearBonus);
+  test.ok(state.childStates[1].blocks.some(block => block === -1), 'All clear nuisance not received');
+
+  test.done();
+};
