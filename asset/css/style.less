@@ -10,4 +10,40 @@ body {
   background: @color-background;
 }
 
+table {
+  border-collapse: collapse;
+  width: 100%;
+
+  tr {
+    border-bottom: 1px solid darken(@color-background, 15%);
+    font-size: 1.1em;
+
+    th {
+      text-align: left;
+    }
+
+    td, th {
+      padding: 0.25em 0.5em;
+    }
+
+    &.selected {
+      background: lighten(@color-background, 15%);
+    }
+  }
+}
+
+button {
+  background: lighten(@color-background, 15%);
+  border: 1px solid darken(@color-background, 5%);
+  border-radius: 10%;
+  color: darken(@color-background, 15%);
+  cursor: pointer;
+  display: inline-block;
+  padding: 0.25em 0.5em;
+  font-size: 1.2em;
+  text-align: center;
+  vertical-align: middle;
+}
+
+@import './lobby';
 @import './panel-league';
