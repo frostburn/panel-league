@@ -1,8 +1,10 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
 
 const GameServer = require('./lib/server');
+const installAPI = require('./lib/api');
 
 
 function parseCommandLineArguments() {
@@ -79,6 +81,10 @@ function launchServer(options) {
       } else {
         app.use(express.static(path.join(__dirname, 'public')));
       }
+
+      app.use(bodyParser.json());
+      const api = installAPI(app, gameServer);  // Value stored for reference counting only.
+
       webSocketServer.on('connection', (socket) => {
         gameServer.addConnection(socket);
       });
