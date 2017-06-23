@@ -52,12 +52,21 @@ Bellow is a description of the HTTP API using Puyo duel mode as an example.
 
 `> {'success': true}`
 
+### (DELETE) /play/{ID}
+ - Deactivate the client
+ - Remeber to call this when you stop using the API or your game will be left unclosed.
+
+`/play/460c1f0`
+
+`> {'success': true}`
+
 ## Intended flow
 Starting a new game:
  - The client creates a new game using (POST) `/game/create`.
  - The client queries (GET) `/play/{ID}?poll=1` until `canPlay` field is `true`.
  - The client makes a move using (POST) `/play/{ID}`.
  - The client resumes querying (GET) `/play/{ID}?poll=1`.
+ - Once the client is done playing it calls (DELETE) `/play/{ID}`.
 
  Joining an existing game:
 - The client queries for open games using (GET) `/game/list?status=open`.
