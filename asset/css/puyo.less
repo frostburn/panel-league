@@ -1,0 +1,183 @@
+@import './variables';
+
+.game.puyo {
+  .column {
+    width: 30%;
+    float: left;
+  }
+  .colum-narrow {
+    width: 20%;
+    float: left;
+  }
+  .display {
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: @block-size / 2;
+    margin-bottom: @block-size / 2;
+    height: @block-size;
+    width: @grid-width * @block-size;
+    background: @color-background-grid;
+    border-radius: 1em;
+    padding-left: @block-size / 2;
+    line-height: @block-size;
+
+    span {
+      color: @color-score;
+      font-size: @block-size / 2;
+      font-family: monospace;
+    }
+  }
+  .deal-preview {
+    float: left;
+    margin-top: 2 * @block-size;
+  }
+  .grid {
+    position: relative;
+    background: @color-background-grid;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: @block-size;
+    width: @grid-width * @block-size;
+    border-radius: 0.3em;
+    overflow-y: hidden;
+  }
+  .piece {
+    &.waiting {
+      opacity: 0.4;
+      transition: opacity 0.2s;
+    }
+    &.active {
+      opacity: 1.0;
+      transition: opacity 0.15s;
+    }
+  }
+  .row {
+    height: @block-size;
+
+    &.ghost {
+      opacity: 0.6;
+    }
+
+    .block {
+      display: inline-block;
+      width: @block-size;
+      height: @block-size;
+      max-width: @block-size;
+      max-height: @block-size;
+      overflow: hidden;
+      border: solid;
+      border-width: @block-border-width;
+      border-radius: 25%;
+      overflow: hidden;
+      text-align: center;
+
+      &.preview {
+        opacity: 0.15;
+      }
+
+      &.connect-top {
+        border-top-width: 0;
+        padding-top: @block-border-width;
+      }
+      &.connect-right {
+        border-right-width: 0;
+        padding-right: @block-border-width;
+      }
+      &.connect-bottom {
+        border-bottom-width: 0;
+        padding-bottom: @block-border-width;
+      }
+      &.connect-left {
+        border-left-width: 0;
+        padding-left: @block-border-width;
+      }
+
+      // All transformations have two versions because we
+      // need to compensate for Firefox rendering differences.
+      &::after {
+        content: ' ';
+        display: inline-block;
+        font-family: FontAwesome;
+        font-size: @block-size * 0.7;
+        transform: translateY(10%);
+        -moz-transform: translateY(0%);
+      }
+
+      &.empty {
+        background: transparent;
+        border-color: transparent;
+      }
+      &.nuisance {
+        background: @color-puyo-nuisance;
+        opacity: 0.96;
+        border-width: 0;
+        padding: 0;
+        &::after {
+          content: @symbol-block-x-circle;
+          color: @color-puyo-nuisance * 0.8;
+          font-size: @block-size;
+          transform: translateY(2%);
+          -moz-transform: translateY(-7%);
+        }
+      }
+      &.red {
+        background: @color-puyo-red;
+        border-color: darken(@color-puyo-red, 30%);
+        &::after {
+          content: @symbol-block-heart;
+          color: lighten(@color-puyo-red, 30%);
+        }
+      }
+      &.green {
+        background: @color-puyo-green;
+        border-color: darken(@color-puyo-green, 30%);
+        &::after {
+          content: @symbol-block-circle;
+          color: lighten(@color-puyo-green, 30%);
+        }
+      }
+      &.blue {
+        background: @color-puyo-blue;
+        border-color: darken(@color-puyo-blue, 30%);
+        &::after {
+          content: @symbol-block-sort-asc;
+          color: lighten(@color-puyo-blue, 30%);
+          font-size: @block-size;
+          transform: scale(1, 1.5) translateY(18%);
+          -moz-transform: scale(1, 1.5) translateY(10%);
+        }
+      }
+      &.yellow {
+        background: @color-puyo-yellow;
+        border-color: darken(@color-puyo-yellow, 30%);
+        &::after {
+          content: @symbol-block-star;
+          color: lighten(@color-puyo-yellow, 30%);
+        }
+      }
+      &.violet {
+        background: @color-puyo-violet;
+        border-color: darken(@color-puyo-violet, 30%);
+        &::after {
+          content: @symbol-block-square;
+          color: lighten(@color-puyo-violet, 30%);
+          font-size: @block-size * 0.6;
+          transform: translateY(18%) rotate(45deg);
+          -moz-transform: translateY(7%) rotate(45deg);
+        }
+      }
+      &.navy {
+        background: @color-puyo-navy;
+        border-color: darken(@color-puyo-navy, 30%);
+        &::after {
+          content: @symbol-block-sort-desc;
+          color: lighten(@color-puyo-navy, 30%);
+          font-size: @block-size;
+          transform: scale(1, 1.5) translateY(-25%);
+          -moz-transform: scale(1, 1.5) translateY(-27%);
+        }
+      }
+    }
+  }
+}
