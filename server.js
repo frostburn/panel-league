@@ -4,6 +4,8 @@ const fs = require('fs');
 const path = require('path');
 
 const GameServer = require('./lib/server');
+const Game = require('./lib/server/game');
+const gameModeFactory = require('./lib/server/gamemode');
 const installAPI = require('./lib/api');
 
 
@@ -90,6 +92,10 @@ function launchServer(options) {
       });
       gameServer.run();
       process.stdout.write(`Server running at http://${address.address}:${address.port}\n`);
+
+      const defaultPanelLeagueSandbox = new Game(gameServer, gameModeFactory('panel-league-sandbox'));
+      gameServer.games[defaultPanelLeagueSandbox.id] = defaultPanelLeagueSandbox;
+      process.stdout.write(`Sandbox game ${defaultPanelLeagueSandbox.id} created\n`);
     }
   );
 }
