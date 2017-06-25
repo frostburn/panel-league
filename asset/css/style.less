@@ -32,10 +32,10 @@ table {
   }
 }
 
-button {
+button, .select-container {
   background: lighten(@color-background, 15%);
   border: 1px solid darken(@color-background, 5%);
-  border-radius: 10%;
+  border-radius: 0.3em;
   color: darken(@color-background, 15%);
   cursor: pointer;
   display: inline-block;
@@ -45,5 +45,23 @@ button {
   vertical-align: middle;
 }
 
+.select-container {
+  width: 220px;
+  overflow: hidden;
+  background-image: url("/img/select-arrow.png");
+  background-repeat: no-repeat;
+  background-position: 96% 0;
+}
+
+select {
+  width: 230px;
+  background: transparent;
+  color: inherit;
+  border: none;
+  font-size: inherit;
+  outline: 0;
+}
+
 @import './lobby';
 @import './panel-league';
+@import './puyo';
