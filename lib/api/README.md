@@ -47,6 +47,7 @@ Bellow is a description of the HTTP API using Puyo duel mode as an example.
 ### (POST) /play/{ID}
  - Make a move in the client's active game.
  - Returns if the move was successfully registered or not.
+ - Unsuccessful moves will have a `reason` field describing the problem.
 
 `/play/460c1f0 {'type': 'addPuyos', 'blocks': [0, 1, 2, 0, 0, 0]}`
 
