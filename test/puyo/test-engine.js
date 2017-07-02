@@ -75,7 +75,7 @@ module.exports.testEndlessRandom = function (test) {
 };
 
 module.exports.testDuelMirror = function (test) {
-  const game = new GameEngine({ stepper: 'puyo:duel' });
+  const game = new GameEngine({ stepper: 'puyo:duel', maxLosses: 7 });
   const RNG = new JKISS31();
 
   test.expect(5002);
@@ -100,13 +100,19 @@ module.exports.testDuelMirror = function (test) {
   }
 
   for (let j = 0; j < 2; ++j) {
-    test.ok(state.deals.length > state.childStates[j].dealIndex + state.numDeals);
+    test.ok(state.deals.length >= state.childStates[j].dealIndex + state.numDeals);
   }
+  if (state.status.terminated) {
+    test.expect(5004);
+    test.strictEqual(state.status.result, 'Draw');
+    test.ok(!state.status.result.loser);
+  }
+
   test.done();
 };
 
 module.exports.testDuelSymmetry = function (test) {
-  const game = new GameEngine({ stepper: 'puyo:duel' });
+  const game = new GameEngine({ stepper: 'puyo:duel', maxLosses: 7 });
   const flippedGame = GameEngine.unserialize(game.serialize());
   const RNG = new JKISS31();
 
@@ -203,6 +209,32 @@ module.exports.testDuelAllClear = function (test) {
   test.ok(!state.childStates[0].allClearBonus);
   test.ok(!state.childStates[0].chainAllClearBonus);
   test.ok(state.childStates[1].blocks.some(block => block === -1), 'All clear nuisance not received');
+
+  test.done();
+};
+
+module.exports.testDuelTermination = function (test) {
+  const game = new GameEngine({ stepper: 'puyo:duel' });
+  let state;
+
+  test.expect(3);
+
+  state = game.step();
+  test.strictEqual(state.time, 1);
+
+  game.addEvent({
+    time: 1,
+    type: 'termination',
+    reason: 'Gotta test this stuff',
+    player: 1,
+  });
+  state = game.step();
+  test.strictEqual(state.time, 1);
+  test.deepEqual(state.status, {
+    terminated: true,
+    loser: 1,
+    result: 'Gotta test this stuff',
+  });
 
   test.done();
 };

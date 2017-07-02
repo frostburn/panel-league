@@ -73,3 +73,5 @@ Starting a new game:
 - The client queries for open games using (GET) `/game/list?status=open`.
 - The client joins game from the returned list using (POST) `/game/join`.
 - Rest of the flow proceeds as before using `/play/{ID}?poll=1`.
+
+Some game modes have a finite lifetime. If `status.terminated` field is `true` you should (DELETE) your connection and restart the flow if you want to play again.
