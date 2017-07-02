@@ -90,7 +90,6 @@ function launchServer(options) {
       webSocketServer.on('connection', (socket) => {
         gameServer.addConnection(socket);
       });
-      gameServer.run();
       process.stdout.write(`Server running at http://${address.address}:${address.port}\n`);
 
       const defaultPanelLeagueSandbox = new Game(gameServer, gameModeFactory('panel-league-sandbox'));
