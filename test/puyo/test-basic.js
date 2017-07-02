@@ -34,8 +34,13 @@ module.exports.testClearGroups = function (test) {
     if (effect.type === 'score') {
       test.strictEqual(effect.score, 40, 'Wrong score for a single clear');
     } else if (effect.type === 'groupCleared') {
-      test.deepEqual(effect.color, 2, 'Wrong color cleared');
-      test.deepEqual(effect.indices, [4, 7, 9, 10], 'Inconsistent clearing indices');
+      if (effect.color === 2) {
+        test.deepEqual(effect.indices, [4, 7, 9, 10], 'Inconsistent clearing indices');
+      } else if (effect.color === basic.nuisancePuyo) {
+        test.deepEqual(effect.indices, [6], 'Wrong nuisance clearing index');
+      } else {
+        test.ok(false);
+      }
     }
   });
   test.done();

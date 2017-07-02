@@ -96,6 +96,7 @@ module.exports.testDuelMirror = function (test) {
     }
     state = game.step();
     state.childStates[1].player = 0;
+    state.childStates[1].effects.forEach(effect => (effect.player = 0));
     test.deepEqual(state.childStates[0], state.childStates[1]);
   }
 
@@ -149,7 +150,9 @@ module.exports.testDuelSymmetry = function (test) {
     flippedState = flippedGame.step();
   }
   state.childStates[1].player = 0;
+  state.childStates[1].effects.forEach(effect => (effect.player = 0));
   flippedState.childStates[1].player = 0;
+  flippedState.childStates[1].effects.forEach(effect => (effect.player = 0));
   test.deepEqual(state.childStates[0], flippedState.childStates[1]);
   test.deepEqual(state.childStates[1], flippedState.childStates[0]);
   test.done();
