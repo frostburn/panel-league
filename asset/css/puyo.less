@@ -1,11 +1,17 @@
 @import './variables';
 
+@keyframes puyo-flashing {
+  to {
+    color: @color-score * 0.6;
+  }
+}
+
 .game.puyo {
   .column {
     width: 30%;
     float: left;
   }
-  .colum-narrow {
+  .column-narrow {
     width: 20%;
     float: left;
   }
@@ -22,14 +28,32 @@
     padding-left: @block-size / 2;
     line-height: @block-size;
 
+    &.narrow {
+      margin-left: 0;
+      width: 3 * @block-size;
+    }
+
     span {
       color: @color-score;
       font-size: @block-size / 2;
       font-family: monospace;
     }
   }
+  .slow-fade-out {
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .slow-fade-in {
+    opacity: 1;
+    transition: opacity 5s;
+  }
+  .flashing {
+    animation-name: puyo-flashing;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+  }
   .deal-preview {
-    float: left;
     margin-top: 2 * @block-size;
   }
   .grid {
