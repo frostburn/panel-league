@@ -21,17 +21,19 @@ Bellow is a description of the HTTP API using Puyo duel mode as an example.
 
 ### (POST) /game/create
  - Create a new game of the given mode.
+ - Metadata can be provided to identify your client.
  - Returns your client's player ID.
 
-`/game/create {mode: 'puyo:duel'}`
+`/game/create {mode: 'puyo:duel', metadata: {name: 'mybot'}}`
 
 `> {'id': '460c1f0'}`
 
 ### (POST) /game/join
  - Join an active game by ID.
+ - Metadata can be provided to identify your client.
  - Returns your client's player ID.
 
-`/game/join {game: '07b92ab'}`
+`/game/join {game: '07b92ab', metadata: {name: 'mybot'}}`
 
 `> {'id': '52b4c92'}`
 
