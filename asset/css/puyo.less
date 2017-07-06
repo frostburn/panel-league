@@ -81,6 +81,17 @@
 
     &.ghost {
       opacity: 0.6;
+
+      .block {
+        &.empty {
+          border-radius: 0;
+          background: darken(@color-background-grid, 2%);
+          &::after {
+            content: @symbol-block-ban;
+            color: darken(@color-background-grid, 7%);
+          }
+        }
+      }
     }
 
     .block {
