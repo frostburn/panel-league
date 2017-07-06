@@ -39,6 +39,7 @@
     "lodash": "^4.17.4",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
+    "redis": "^2.7.1",
     "redom": "^2.7.1",
     "socket.io": "^1.7.2",
     "style-loader": "^0.13.1",

@@ -11,6 +11,10 @@ After that you can use command `npm run build` to compile the assets. You can
 also run `run run watch`, which launches Webpack in watch mode where it
 observes changes made to the user interface files.
 
+# Additional dependencies
+
+Redis is used by default to handle session data, but it can be replaced with in-memory storage by using the --no-redis flag when starting the server.
+
 # Running the server
 
 After assets have been compiled, you can run command `npm start` and navigate

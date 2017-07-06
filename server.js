@@ -24,6 +24,9 @@ function parseCommandLineArguments() {
     .option('-h, --host <host>', 'Hostname to run the HTTPD on')
     .option('-p, --port <port>', 'TCP/IP port to run the HTTPD on')
     .option('-d, --debug', 'Launch server in debug/development mode')
+    .option('--redis-url <url>', 'URL of the Redis server')
+    .option('--redis-path <sock>', 'The UNIX socket string of the Redis server')
+    .option('--no-redis', 'Fall back to in-memory storage')
     .parse(process.argv);
 
   if (parser.host) {
@@ -43,6 +46,16 @@ function parseCommandLineArguments() {
     options.debug = true;
   }
 
+  if (parser.redis === false) {
+    options.noRedis = true;
+  }
+  if (parser.redisUrl) {
+    options.redisUrl = parser.redisUrl;
+  }
+  if (parser.redisPath) {
+    options.redisPath = parser.redisPath;
+  }
+
   return options;
 }
 
@@ -59,7 +72,10 @@ function launchServer(options) {
     () => {
       const address = httpServer.address();
       const gameServer = new GameServer();
-      const sessionHandler = new SessionHandler();
+      const sessionHandler = new SessionHandler({
+        url: options.redisUrl,
+        path: options.redisPath,
+      }, options.noRedis);
 
       app.use(cookieParser());
       app.use(sessionCookieMiddleware());
