@@ -4,6 +4,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  font-family: Arial, Verdana, sans-serif;
 }
 
 body {
@@ -32,12 +33,11 @@ table {
   }
 }
 
-button, .select-container {
+button, label, input, .select-container {
   background: lighten(@color-background, 15%);
   border: 1px solid darken(@color-background, 5%);
   border-radius: 0.3em;
   color: darken(@color-background, 15%);
-  cursor: pointer;
   display: inline-block;
   padding: 0.25em 0.5em;
   font-size: 1.2em;
@@ -45,7 +45,12 @@ button, .select-container {
   vertical-align: middle;
 }
 
+button {
+  cursor: pointer;
+}
+
 .select-container {
+  cursor: pointer;
   width: 220px;
   overflow: hidden;
   background-image: url("/img/select-arrow.png");
@@ -60,6 +65,11 @@ select {
   border: none;
   font-size: inherit;
   outline: 0;
+}
+
+input[type=text] {
+  background: lighten(@color-background, 65%);
+  text-align: left;
 }
 
 @import './lobby';
