@@ -115,7 +115,7 @@ function launchServer(options) {
       });
       process.stdout.write(`Server running at http://${address.address}:${address.port}\n`);
 
-      const defaultPanelLeagueSandbox = new Game(gameServer, gameModeFactory('panel-league-sandbox'));
+      const defaultPanelLeagueSandbox = new Game(gameServer, gameModeFactory('panel-league:sandbox'));
       gameServer.games[defaultPanelLeagueSandbox.id] = defaultPanelLeagueSandbox;
       process.stdout.write(`Sandbox game ${defaultPanelLeagueSandbox.id} created\n`);
     }
