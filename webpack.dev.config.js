@@ -27,7 +27,11 @@ module.exports = {
       },
       {
         test: /\.png$/,
-        loader: 'url-loader?mimetype=image/png',
+        loader: 'url-loader?mimetype=image/png!image-webpack-loader',
+      },
+      {
+        test: /\.svg$/,
+        loader: 'url-loader?mimetype=image/svg+xml!image-webpack-loader',
       },
     ],
   },
