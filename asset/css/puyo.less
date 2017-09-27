@@ -7,42 +7,66 @@
 }
 
 .game.puyo {
-  .column {
-    width: 30%;
-    float: left;
+  .endless {
+    display: grid;
+    grid-template-areas:
+      'incoming name'
+      'grid dealPreview'
+      'grid waiting'
+      'grid time'
+      'grid score'
+      'grid gameOver'
+      'grid .';
+    grid-column-gap: @puyo-block-size * 0.5;
+    margin-left: @puyo-display-size * 0.2;
   }
-  .column-narrow {
-    width: 20%;
-    float: left;
-  }
-  .display {
-    position: relative;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: @block-size / 2;
-    margin-bottom: @block-size / 2;
-    height: @block-size;
-    width: @grid-width * @block-size;
-    background: @color-background-grid;
-    border-radius: 1em;
-    padding-left: @block-size / 2;
-    line-height: @block-size;
 
-    &.narrow {
-      margin-left: 0;
-      width: auto;
-      max-width: 11em;
-      height: auto;
-      line-height: 2em;
-      text-align: center;
-      padding-left: 1em;
-      padding-right: 1em;
+  .incoming {
+    grid-area: incoming;
+  }
+  .grid-and-piece {
+    grid-area: grid;
+  }
+  .deal-preview {
+    grid-area: dealPreview;
+    .row {
+      margin-bottom: @puyo-display-size;
+      display: grid;
+      grid-template-columns: repeat(2, @puyo-block-size);
     }
+  }
+  .waiting {
+    grid-area: waiting;
+  }
+  .time {
+    grid-area: time;
+  }
+  .score {
+    grid-area: score;
+  }
+  .game-over {
+    grid-area: gameOver;
+  }
+  .name {
+    grid-area: name;
+  }
 
-    span {
-      color: @color-score;
-      font-size: @block-size / 2;
-      font-family: monospace;
+  .display {
+    margin-right: 0.2 * @puyo-display-size;
+    margin-top: @puyo-display-size * 0.5;
+    margin-bottom: @puyo-display-size * 0.5;
+    height: @puyo-display-size;
+    width: @grid-width * @puyo-display-size;
+    background: @color-background-grid;
+    border-radius: @puyo-display-size * 0.3;
+    padding-left: @puyo-display-size * 0.3;
+    line-height: @puyo-display-size;
+
+    color: @color-score;
+    font-size: @puyo-display-size * 0.5;
+    font-family: monospace;
+    &.score {
+      height: 2 * @puyo-display-size;
     }
   }
   .slow-fade-out {
@@ -59,81 +83,75 @@
     animation-iteration-count: infinite;
     animation-direction: alternate;
   }
-  .deal-preview {
-    margin-top: 2 * @block-size;
+  .grid-base {
+    background: @color-background-grid;
+    overflow-y: hidden;
+    width: @grid-width * @puyo-block-size;
+    display: grid;
+    grid-template-columns: repeat(@grid-width, @puyo-block-size);
+    grid-auto-rows: @puyo-block-size;
   }
   .grid {
-    position: relative;
-    background: @color-background-grid;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: @block-size;
-    width: @grid-width * @block-size;
-    border-radius: 0.3em;
-    overflow-y: hidden;
+    grid-area: grid;
+    border-radius: 0 0 @puyo-block-size * 0.1 @puyo-block-size * 0.1;
+    .grid-base;
   }
   .piece {
+    grid-area: piece;
+    border-radius: @puyo-block-size * 0.1 @puyo-block-size * 0.1 0 0;
+    .grid-base;
     &.waiting {
-      opacity: 0.4;
-      transition: opacity 0.2s;
+      .block {
+        opacity: 0.4;
+        transition: opacity 0.2s;
+      }
     }
     &.active {
-      opacity: 1.0;
-      transition: opacity 0.15s;
+      .block {
+        opacity: 1.0;
+        transition: opacity 0.15s;
+      }
     }
   }
-  .row {
-    height: @block-size;
-
+  .block {
+    width: 100%;
+    padding-bottom: 100%;
+    &.preview {
+      opacity: 0.15;
+    }
     &.ghost {
       opacity: 0.6;
-      .block {
-        background-image: url('../img/puyo/ghost.svg');
-      }
+      background-image: url('../img/puyo/ghost.svg');
     }
 
-    .block {
-      display: inline-block;
-      width: @block-size;
-      height: @block-size;
-      max-width: @block-size;
-      max-height: @block-size;
-      overflow: hidden;
-      text-align: center;
-
-      &.preview {
-        opacity: 0.15;
-      }
-
-      &.nuisance {
-        background-image: url('../img/puyo/block-x.svg');
-        opacity: 0.96;
-        &.cleared {
-          opacity: 0.5;
-          filter: none;
-        }
-      }
-      &.red {
-        background-image: url('../img/puyo/block-heart.svg');
-      }
-      &.green {
-        background-image: url('../img/puyo/block-circle.svg');
-      }
-      &.blue {
-        background-image: url('../img/puyo/block-triangle.svg');
-      }
-      &.yellow {
-        background-image: url('../img/puyo/block-star.svg');
-      }
-      &.violet {
-        background-image: url('../img/puyo/block-diamond.svg');
-      }
-      &.navy {
-        background-image: url('../img/puyo/block-wedge.svg');
-      }
+    &.nuisance {
+      background-image: url('../img/puyo/block-x.svg');
+      opacity: 0.96;
       &.cleared {
-        filter: contrast(50%) brightness(200%);
+        opacity: 0.5;
+        filter: none;
       }
+    }
+    &.red {
+      background-image: url('../img/puyo/block-heart.svg');
+    }
+    &.green {
+      background-image: url('../img/puyo/block-circle.svg');
+    }
+    &.blue {
+      background-image: url('../img/puyo/block-triangle.svg');
+    }
+    &.yellow {
+      background-image: url('../img/puyo/block-star.svg');
+    }
+    &.violet {
+      background-image: url('../img/puyo/block-diamond.svg');
+    }
+    &.navy {
+      background-image: url('../img/puyo/block-wedge.svg');
+    }
+    &.cleared {
+      filter: contrast(50%) brightness(200%);
     }
   }
 }
