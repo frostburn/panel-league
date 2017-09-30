@@ -7,11 +7,21 @@
 }
 
 .game.puyo {
+  display: grid;
   width: 100%;
   margin-left: @puyo-display-size * 0.2;
   @media @medium-view {
     width: @puyo-block-size-h * (2 * @grid-width + 2);
     margin: auto;
+  }
+  grid-template-areas:
+    'left';
+  @media @wide-view {
+    width: @puyo-block-size-h * (4 * @grid-width + 4);
+    grid-template-areas:
+      'left right';
+    grid-template-rows: 1fr 1fr;
+    grid-column-gap: @puyo-block-size-h;
   }
   .endless {
     display: grid;
@@ -32,6 +42,7 @@
 
   .duel {
     .endless;
+    grid-area: left;
     grid-template-areas:
       'incoming name'
       'grid dealPreview'
@@ -43,11 +54,34 @@
     .waiting, .score, .game-over {
       display: none;
     }
+    @media @wide-view {
+      grid-template-areas:
+        'incoming name'
+        'grid dealPreview'
+        'grid waiting'
+        'grid time'
+        'grid score'
+        'grid gameOver'
+        'grid .';
+      .waiting, .score, .game-over {
+        display: block;
+      }
+    }
+  }
+  .wide-view {
+    grid-area: right;
+    display: none;
+    @media @wide-view {
+      display: grid;
+    }
   }
 
   .opponent-grid {
     grid-area: opponentGrid;
     display: grid;
+    @media @wide-view {
+      display: none;
+    }
     grid-template-areas:
       'name dealPreview'
       'grid dealPreview';
