@@ -21,6 +21,58 @@
     margin-left: @puyo-display-size * 0.2;
   }
 
+  .duel {
+    .endless;
+    grid-template-areas:
+      'incoming name'
+      'grid dealPreview'
+      'grid time'
+      'grid opponentGrid'
+      'grid opponentGrid'
+      'grid opponentGrid'
+      'grid opponentGrid';
+    .waiting, .score, .game-over {
+      display: none;
+    }
+  }
+
+  .opponent-grid {
+    grid-area: opponentGrid;
+    display: grid;
+    grid-template-areas:
+      'name dealPreview'
+      'grid dealPreview';
+    .incoming, .waiting, .time, .score, .game-over {
+      display: none;
+    }
+    .display {
+      height: @puyo-small-size;
+      font-size: @puyo-small-size * 0.5;
+      line-height: @puyo-small-size;
+      width: @grid-width * @puyo-small-size;
+    }
+    .grid-and-piece {
+      .piece {
+        display: none;
+      }
+      .grid {
+        width: @grid-width * @puyo-small-size;
+        grid-template-columns: repeat(@grid-width, @puyo-small-size);
+        grid-auto-rows: @puyo-small-size;
+      }
+    }
+    .deal-preview {
+      padding-top: 3 * @puyo-small-size;
+      .row {
+        margin-bottom: @puyo-small-size;
+        grid-template-columns: @puyo-small-size;
+      }
+      .row:first-child {
+        display: grid;
+      }
+    }
+  }
+
   .incoming {
     grid-area: incoming;
   }
@@ -33,6 +85,9 @@
       margin-bottom: @puyo-display-size;
       display: grid;
       grid-template-columns: repeat(2, @puyo-block-size);
+    }
+    .row:first-child {
+      display: none;
     }
   }
   .waiting {
@@ -99,8 +154,10 @@
   .piece {
     grid-area: piece;
     border-radius: @puyo-block-size * 0.1 @puyo-block-size * 0.1 0 0;
+    padding-bottom: 1px;
+    margin-bottom: -1px;
     .grid-base;
-    &.waiting {
+    &.pending {
       .block {
         opacity: 0.4;
         transition: opacity 0.2s;
