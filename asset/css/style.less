@@ -72,6 +72,19 @@ input[type=text] {
   text-align: left;
 }
 
+footer {
+  position: absolute;
+  z-index: -1000;  // This a hack until we make things more responsive.
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 0.8rem;
+  color: darken(@color-background, 80%);
+  background-color: lighten(@color-background, 10%);
+  text-align: center;
+  font-size: 1.2rem;
+}
+
 @import './lobby';
 @import './panel-league';
 @import './puyo';
