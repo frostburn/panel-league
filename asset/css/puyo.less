@@ -7,6 +7,22 @@
 }
 
 .game.puyo {
+  display: grid;
+  width: 100%;
+  margin-left: @puyo-display-size * 0.2;
+  @media @medium-view {
+    width: @puyo-block-size-h * (2 * @grid-width + 2);
+    margin: auto;
+  }
+  grid-template-areas:
+    'left';
+  @media @wide-view {
+    width: @puyo-block-size-h * (4 * @grid-width + 4);
+    grid-template-areas:
+      'left right';
+    grid-template-rows: 1fr 1fr;
+    grid-column-gap: @puyo-block-size-h;
+  }
   .endless {
     display: grid;
     grid-template-areas:
@@ -18,11 +34,15 @@
       'grid gameOver'
       'grid .';
     grid-column-gap: @puyo-block-size * 0.5;
-    margin-left: @puyo-display-size * 0.2;
+    @media @medium-view {
+      grid-column-gap: @puyo-block-size-h * 0.5;
+      margin-left: 0;
+    }
   }
 
   .duel {
     .endless;
+    grid-area: left;
     grid-template-areas:
       'incoming name'
       'grid dealPreview'
@@ -34,11 +54,34 @@
     .waiting, .score, .game-over {
       display: none;
     }
+    @media @wide-view {
+      grid-template-areas:
+        'incoming name'
+        'grid dealPreview'
+        'grid waiting'
+        'grid time'
+        'grid score'
+        'grid gameOver'
+        'grid .';
+      .waiting, .score, .game-over {
+        display: block;
+      }
+    }
+  }
+  .wide-view {
+    grid-area: right;
+    display: none;
+    @media @wide-view {
+      display: grid;
+    }
   }
 
   .opponent-grid {
     grid-area: opponentGrid;
     display: grid;
+    @media @wide-view {
+      display: none;
+    }
     grid-template-areas:
       'name dealPreview'
       'grid dealPreview';
@@ -50,6 +93,12 @@
       font-size: @puyo-small-size * 0.5;
       line-height: @puyo-small-size;
       width: @grid-width * @puyo-small-size;
+      @media @medium-view {
+        height: @puyo-small-size-h;
+        font-size: @puyo-small-size-h * 0.5;
+        line-height: @puyo-small-size-h;
+        width: @grid-width * @puyo-small-size-h;
+      }
     }
     .grid-and-piece {
       .piece {
@@ -59,6 +108,11 @@
         width: @grid-width * @puyo-small-size;
         grid-template-columns: repeat(@grid-width, @puyo-small-size);
         grid-auto-rows: @puyo-small-size;
+        @media @medium-view {
+          width: @grid-width * @puyo-small-size-h;
+          grid-template-columns: repeat(@grid-width, @puyo-small-size-h);
+          grid-auto-rows: @puyo-small-size-h;
+        }
       }
     }
     .deal-preview {
@@ -66,9 +120,16 @@
       .row {
         margin-bottom: @puyo-small-size;
         grid-template-columns: @puyo-small-size;
+        @media @medium-view {
+          margin-bottom: @puyo-small-size-h;
+          grid-template-columns: @puyo-small-size-h;
+        }
       }
       .row:first-child {
         display: grid;
+      }
+      @media @medium-view {
+        padding-top: 3 * @puyo-small-size-h;
       }
     }
   }
@@ -85,6 +146,10 @@
       margin-bottom: @puyo-display-size;
       display: grid;
       grid-template-columns: repeat(2, @puyo-block-size);
+      @media @medium-view {
+        margin-bottom: @puyo-display-size-h;
+        grid-template-columns: repeat(2, @puyo-block-size-h);
+      }
     }
     .row:first-child {
       display: none;
@@ -123,6 +188,21 @@
     &.score {
       height: 2 * @puyo-display-size;
     }
+
+    @media @medium-view {
+      margin-right: 0.2 * @puyo-display-size-h;
+      margin-top: @puyo-display-size-h * 0.5;
+      margin-bottom: @puyo-display-size-h * 0.5;
+      height: @puyo-display-size-h;
+      width: @grid-width * @puyo-display-size-h;
+      border-radius: @puyo-display-size-h * 0.3;
+      padding-left: @puyo-display-size-h * 0.3;
+      line-height: @puyo-display-size-h;
+      font-size: @puyo-display-size-h * 0.5;
+      &.score {
+        height: 2 * @puyo-display-size-h;
+      }
+    }
   }
   .slow-fade-out {
     opacity: 0;
@@ -140,23 +220,34 @@
   }
   .grid-base {
     background: @color-background-grid;
+    display: grid;
     overflow-y: hidden;
     width: @grid-width * @puyo-block-size;
-    display: grid;
     grid-template-columns: repeat(@grid-width, @puyo-block-size);
     grid-auto-rows: @puyo-block-size;
+    @media @medium-view {
+      width: @grid-width * @puyo-block-size-h;
+      grid-template-columns: repeat(@grid-width, @puyo-block-size-h);
+      grid-auto-rows: @puyo-block-size-h;
+    }
   }
   .grid {
+    .grid-base;
     grid-area: grid;
     border-radius: 0 0 @puyo-block-size * 0.1 @puyo-block-size * 0.1;
-    .grid-base;
+    @media @medium-view {
+      border-radius: 0 0 @puyo-block-size-h * 0.1 @puyo-block-size-h * 0.1;
+    }
   }
   .piece {
+    .grid-base;
     grid-area: piece;
     border-radius: @puyo-block-size * 0.1 @puyo-block-size * 0.1 0 0;
+    @media @medium-view {
+      border-radius: @puyo-block-size-h * 0.1 @puyo-block-size-h * 0.1 0 0;
+    }
     padding-bottom: 1px;
     margin-bottom: -1px;
-    .grid-base;
     &.pending {
       .block {
         opacity: 0.4;
