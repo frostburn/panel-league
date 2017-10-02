@@ -40,7 +40,7 @@ module.exports.testEndless = function (test) {
   engine.step();
 
   const data = Exporter.exportEndless(engine);
-  test.expect(2);
+  test.expect(3);
   test.deepEqual(data.track, [
     1, 1, 0, 0, 0, 0,
     0, 0, 2, 2, 0, 0,
@@ -53,8 +53,8 @@ module.exports.testEndless = function (test) {
   engineCopy.step();
   engineCopy.step();
   engineCopy.step();
-  engineCopy.step();
-  test.deepEqual(engineCopy.currentState.blocks, [
+  state = engineCopy.step();
+  test.deepEqual(state.blocks, [
     0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0,
@@ -69,6 +69,10 @@ module.exports.testEndless = function (test) {
     0, 0, 3, 0, 0, 0,
     1, 1, 2, 2, 3, 2
   ]);
+  test.deepEqual(
+    state.deals.slice(0, 4),
+    [[1, 1], [2, 2], [1, 3], [2, 3]]
+  );
 
   test.done();
 };
@@ -97,9 +101,10 @@ module.exports.testDuel = function (test) {
   engine.step();
 
   const data = Exporter.exportDuel(engine);
-  test.expect(4);
-  test.deepEqual(data[0].track, [1, 1, 0, 0, 0, 0]);
-  test.deepEqual(data[1].track, [0, 0, 0, 0, 1, 1]);
+  test.expect(6);
+  test.deepEqual(data.players[0].track, [1, 1, 0, 0, 0, 0]);
+  test.deepEqual(data.players[1].track, [0, 0, 0, 0, 1, 1]);
+  test.strictEqual(data.deals.length, engine.currentState.numDeals);
 
   const engineCopy = Exporter.importDuel(data);
   engineCopy.step();
@@ -107,5 +112,6 @@ module.exports.testDuel = function (test) {
 
   test.ok(state.status.terminated);
   test.deepEqual(state.childStates[1].blocks.slice(72), [0, 0, 0, 0, 1, 1]);
+  test.deepEqual(state.deals[0], [1, 1]);
   test.done();
 }
