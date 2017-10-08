@@ -55,12 +55,12 @@ module.exports.testEndlessRandom = function (test) {
   const game = new GameEngine({ stepper: 'puyo:endless' });
   const RNG = new JKISS31();
 
-  test.expect(1001);
+  test.expect(101);
   RNG.scramble();
   let state = game.initialState;
-  for (let i = 0; i < 1000; ++i) {
-    const blocks = basic.randomPuyos(RNG, state.deals[0], state.width);
-    const tail = state.deals.slice(1);
+  for (let i = 0; i < 100; ++i) {
+    const blocks = basic.randomPuyos(RNG, state.deals[state.dealIndex], state.width);
+    const tail = state.deals.slice(1 - state.numDeals);
 
     game.addEvent({
       time: state.time,
@@ -68,7 +68,7 @@ module.exports.testEndlessRandom = function (test) {
       blocks,
     });
     state = game.step();
-    test.deepEqual(tail, state.deals.slice(0, -1), 'Deals not advanced correctly');
+    test.deepEqual(tail, state.deals.slice(state.dealIndex, -1), 'Deals not advanced correctly');
   }
   test.ok(state.totalScore > 0, 'Score not accumulated');
   test.done();
@@ -78,10 +78,10 @@ module.exports.testDuelMirror = function (test) {
   const game = new GameEngine({ stepper: 'puyo:duel', maxLosses: 7 });
   const RNG = new JKISS31();
 
-  test.expect(5002);
+  test.expect(502);
   RNG.scramble();
   let state = game.initialState;
-  for (let i = 0; i < 1000; ++i) {
+  for (let i = 0; i < 100; ++i) {
     const deal = basic.dealForPlayer(state, 0);
     const blocks = basic.randomPuyos(RNG, deal, state.width);
     for (let j = 0; j < 2; ++j) {
@@ -104,7 +104,7 @@ module.exports.testDuelMirror = function (test) {
     test.ok(state.deals.length >= state.childStates[j].dealIndex + state.numDeals);
   }
   if (state.status.terminated) {
-    test.expect(5004);
+    test.expect(504);
     test.strictEqual(state.status.result, 'Draw');
     test.ok(!state.status.result.loser);
   }
@@ -122,7 +122,7 @@ module.exports.testDuelSymmetry = function (test) {
 
   test.expect(2);
   let state = game.initialState;
-  for (let i = 0; i < 1000; ++i) {
+  for (let i = 0; i < 100; ++i) {
     for (let j = 0; j < 2; ++j) {
       const deal = basic.dealForPlayer(state, j);
       const blocks = basic.randomPuyos(RNG, deal, state.width);
@@ -136,7 +136,7 @@ module.exports.testDuelSymmetry = function (test) {
     state = game.step();
   }
   let flippedState = flippedGame.initialState;
-  for (let i = 0; i < 1000; ++i) {
+  for (let i = 0; i < 100; ++i) {
     for (let j = 1; j >= 0; --j) {
       const deal = basic.dealForPlayer(flippedState, j);
       const blocks = basic.randomPuyos(flippedRNG, deal, flippedState.width);
